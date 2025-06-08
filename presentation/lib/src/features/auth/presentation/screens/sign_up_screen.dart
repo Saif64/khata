@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+
 import '../../application/auth.dart';
 // import 'package:your_app/core/di/injection.dart';
 
@@ -38,7 +39,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
             phone: _phoneController.text,
             password: _passwordController.text,
             email: _emailController.text.isEmpty ? null : _emailController.text,
-            profileUrl: _profileUrlController.text.isEmpty ? null : _profileUrlController.text,
+            profileUrl: _profileUrlController.text.isEmpty
+                ? null
+                : _profileUrlController.text,
           ));
     }
   }
@@ -65,7 +68,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
           padding: const EdgeInsets.all(16.0),
           child: Form(
             key: _formKey,
-            child: ListView( // Changed to ListView to prevent overflow with more fields
+            child: ListView(
+              // Changed to ListView to prevent overflow with more fields
               children: <Widget>[
                 TextFormField(
                   controller: _nameController,
@@ -107,13 +111,15 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 const SizedBox(height: 16),
                 TextFormField(
                   controller: _emailController,
-                  decoration: const InputDecoration(labelText: 'Email (Optional)'),
+                  decoration:
+                      const InputDecoration(labelText: 'Email (Optional)'),
                   keyboardType: TextInputType.emailAddress,
                 ),
                 const SizedBox(height: 16),
                 TextFormField(
                   controller: _profileUrlController,
-                  decoration: const InputDecoration(labelText: 'Profile URL (Optional, Placeholder)'),
+                  decoration: const InputDecoration(
+                      labelText: 'Profile URL (Optional, Placeholder)'),
                 ),
                 const SizedBox(height: 24),
                 _isLoading

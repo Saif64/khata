@@ -2,11 +2,9 @@ import 'dart:async';
 
 import 'package:bloc/bloc.dart';
 import 'package:domain/domain.dart';
-import 'package:injectable/injectable.dart';
 
 import '../auth.dart';
 
-@injectable
 class AuthBloc extends Bloc<AuthEvent, AuthState> {
   final AuthRepository _authRepository;
   late StreamSubscription<UserEntity?> _userSubscription;
