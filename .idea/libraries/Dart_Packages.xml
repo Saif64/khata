@@ -74,6 +74,13 @@
             </list>
           </value>
         </entry>
+        <entry key="bloc_test">
+          <value>
+            <list>
+              <option value="$USER_HOME$/.pub-cache/hosted/pub.dev/bloc_test-10.0.0/lib" />
+            </list>
+          </value>
+        </entry>
         <entry key="boolean_selector">
           <value>
             <list>
@@ -212,6 +219,13 @@
             <list>
               <option value="$USER_HOME$/.pub-cache/hosted/pub.dev/dart_style-3.1.0/lib" />
               <option value="$USER_HOME$/.pub-cache/hosted/pub.dev/dart_style-2.3.8/lib" />
+            </list>
+          </value>
+        </entry>
+        <entry key="diff_match_patch">
+          <value>
+            <list>
+              <option value="$USER_HOME$/.pub-cache/hosted/pub.dev/diff_match_patch-0.4.1/lib" />
             </list>
           </value>
         </entry>
@@ -513,6 +527,21 @@
           <value>
             <list>
               <option value="$USER_HOME$/.pub-cache/hosted/pub.dev/mime-2.0.0/lib" />
+            </list>
+          </value>
+        </entry>
+        <entry key="mockito">
+          <value>
+            <list>
+              <option value="$USER_HOME$/.pub-cache/hosted/pub.dev/mockito-5.4.6/lib" />
+              <option value="$USER_HOME$/.pub-cache/hosted/pub.dev/mockito-5.4.5/lib" />
+            </list>
+          </value>
+        </entry>
+        <entry key="mocktail">
+          <value>
+            <list>
+              <option value="$USER_HOME$/.pub-cache/hosted/pub.dev/mocktail-1.0.4/lib" />
             </list>
           </value>
         </entry>
@@ -842,8 +871,8 @@
         <entry key="test">
           <value>
             <list>
-              <option value="$USER_HOME$/.pub-cache/hosted/pub.dev/test-1.26.2/lib" />
               <option value="$USER_HOME$/.pub-cache/hosted/pub.dev/test-1.25.15/lib" />
+              <option value="$USER_HOME$/.pub-cache/hosted/pub.dev/test-1.26.2/lib" />
             </list>
           </value>
         </entry>
@@ -858,8 +887,8 @@
         <entry key="test_core">
           <value>
             <list>
-              <option value="$USER_HOME$/.pub-cache/hosted/pub.dev/test_core-0.6.11/lib" />
               <option value="$USER_HOME$/.pub-cache/hosted/pub.dev/test_core-0.6.8/lib" />
+              <option value="$USER_HOME$/.pub-cache/hosted/pub.dev/test_core-0.6.11/lib" />
             </list>
           </value>
         </entry>
@@ -944,7 +973,6 @@
           <value>
             <list>
               <option value="$USER_HOME$/.pub-cache/hosted/pub.dev/vm_service-15.0.0/lib" />
-              <option value="$USER_HOME$/.pub-cache/hosted/pub.dev/vm_service-15.0.2/lib" />
             </list>
           </value>
         </entry>
@@ -1018,6 +1046,7 @@
       <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dev/args-2.7.0/lib" />
       <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dev/async-2.13.0/lib" />
       <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dev/bloc-9.0.0/lib" />
+      <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dev/bloc_test-10.0.0/lib" />
       <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dev/boolean_selector-2.1.2/lib" />
       <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dev/build-2.4.2/lib" />
       <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dev/build_config-1.1.2/lib" />
@@ -1039,6 +1068,7 @@
       <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dev/cupertino_icons-1.0.8/lib" />
       <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dev/dart_style-2.3.8/lib" />
       <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dev/dart_style-3.1.0/lib" />
+      <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dev/diff_match_patch-0.4.1/lib" />
       <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dev/equatable-2.0.7/lib" />
       <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dev/fake_async-1.3.3/lib" />
       <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dev/ffi-2.1.4/lib" />
@@ -1079,6 +1109,9 @@
       <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dev/material_color_utilities-0.11.1/lib" />
       <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dev/meta-1.16.0/lib" />
       <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dev/mime-2.0.0/lib" />
+      <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dev/mockito-5.4.5/lib" />
+      <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dev/mockito-5.4.6/lib" />
+      <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dev/mocktail-1.0.4/lib" />
       <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dev/nested-1.0.0/lib" />
       <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dev/node_preamble-2.0.2/lib" />
       <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dev/package_config-2.2.0/lib" />
@@ -1143,7 +1176,6 @@
       <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dev/url_launcher_windows-3.1.4/lib" />
       <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dev/vector_math-2.1.4/lib" />
       <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dev/vm_service-15.0.0/lib" />
-      <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dev/vm_service-15.0.2/lib" />
       <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dev/watcher-1.1.1/lib" />
       <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dev/web-1.1.1/lib" />
       <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dev/web_socket-1.0.1/lib" />

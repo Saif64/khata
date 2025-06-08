@@ -1,12 +1,10 @@
 import 'dart:async';
 
 import 'package:bloc/bloc.dart';
-import 'package:equatable/equatable.dart';
-import 'package:injectable/injectable.dart';
 import 'package:domain/domain.dart';
+import 'package:injectable/injectable.dart';
 
-import '../event/auth_event.dart';
-import '../state/auth_state.dart';
+import '../auth.dart';
 
 @injectable
 class AuthBloc extends Bloc<AuthEvent, AuthState> {
@@ -15,11 +13,12 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
 
   AuthBloc(this._authRepository) : super(const AuthInitial()) {
     _userSubscription = _authRepository.authStateChanges.listen(
-      (user) => add(_AuthStateChanged(user)),
+      (user) => add(AuthStateChanged(user)),
     );
 
-    on<_AuthStateChanged>((event, emit) {
-      final user = event.user; // Assign to a local variable for clarity and stability
+    on<AuthStateChanged>((event, emit) {
+      final user =
+          event.user; // Assign to a local variable for clarity and stability
       if (user != null) {
         emit(Authenticated(user)); // Pass the non-null user
       } else {
@@ -74,7 +73,9 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       final failureOrVoid = await _authRepository.signOut();
       failureOrVoid.fold(
         (failure) => emit(AuthFailureState(failure.message)),
-        (_) => emit(const Unauthenticated(message: 'Successfully signed out.')), // AuthStateChanged will also fire
+        (_) => emit(const Unauthenticated(
+            message:
+                'Successfully signed out.')), // AuthStateChanged will also fire
       );
     });
   }

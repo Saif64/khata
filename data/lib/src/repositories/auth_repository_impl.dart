@@ -1,7 +1,8 @@
 import 'dart:async';
-import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:fpdart/fpdart.dart';
+
 import 'package:domain/domain.dart'; // Assuming this will be set up to export necessary domain files
+import 'package:fpdart/fpdart.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 // TODO: Later, ensure domain/domain.dart exports:
 // export 'src/entities/user_entity.dart';
@@ -28,7 +29,8 @@ class AuthRepositoryImpl implements AuthRepository {
       );
 
       if (response.user == null) {
-        return Left(UserAlreadyExistsFailure('User with this phone already exists or another error occurred.'));
+        return Left(UserAlreadyExistsFailure(
+            'User with this phone already exists or another error occurred.'));
       }
 
       final userId = response.user!.id;
@@ -54,8 +56,10 @@ class AuthRepositoryImpl implements AuthRepository {
       }
       // Check for user already exists more specifically if possible,
       // Supabase might throw a specific error code or message pattern
-      if (e.statusCode == '422' || e.message.toLowerCase().contains('already exists')) {
-         return Left(UserAlreadyExistsFailure('User with this phone already exists.'));
+      if (e.statusCode == '422' ||
+          e.message.toLowerCase().contains('already exists')) {
+        return Left(
+            UserAlreadyExistsFailure('User with this phone already exists.'));
       }
       return Left(ServerFailure('Supabase auth error: ${e.message}'));
     } catch (e) {
@@ -91,7 +95,7 @@ class AuthRepositoryImpl implements AuthRepository {
       // If Supabase returns a map directly and it's empty, that's another case.
       // Assuming profileResponse is Map<String, dynamic>
       if (profileResponse.isEmpty) {
-         return Left(UserNotFoundFailure('User profile not found.'));
+        return Left(UserNotFoundFailure('User profile not found.'));
       }
 
       return Right(UserEntity(
@@ -110,12 +114,12 @@ class AuthRepositoryImpl implements AuthRepository {
       }
       return Left(ServerFailure('Supabase auth error: ${e.message}'));
     } on PostgrestException catch (e) {
-        if (e.code == 'PGRST116') { // PGRST116: "The result contains 0 rows"
-            return Left(UserNotFoundFailure('User profile not found.'));
-        }
-        return Left(ServerFailure('Database error: ${e.message}'));
-    }
-    catch (e) {
+      if (e.code == 'PGRST116') {
+        // PGRST116: "The result contains 0 rows"
+        return Left(UserNotFoundFailure('User profile not found.'));
+      }
+      return Left(ServerFailure('Database error: ${e.message}'));
+    } catch (e) {
       return Left(UnknownFailure('An unknown error occurred: ${e.toString()}'));
     }
   }
@@ -140,7 +144,8 @@ class AuthRepositoryImpl implements AuthRepository {
         // Supabase user.phone might be null, ensure null safety
         phone: profileResponse['phone'] ?? supabaseUser.phone ?? '',
         name: profileResponse['name'],
-        email: profileResponse['email'], // Email might be in profile or from Supabase user
+        email: profileResponse[
+            'email'], // Email might be in profile or from Supabase user
         profileUrl: profileResponse['profile_url'],
       ));
     } on PostgrestException catch (e) {
@@ -149,11 +154,13 @@ class AuthRepositoryImpl implements AuthRepository {
         // It's possible the user exists in auth but profile creation failed or is pending.
         // Depending on app requirements, you might return Right(UserEntity with partial data)
         // or Left(failure). For now, returning failure.
-        return Left(UserNotFoundFailure('User profile not found. Associated auth user exists.'));
+        return Left(UserNotFoundFailure(
+            'User profile not found. Associated auth user exists.'));
       }
       return Left(ServerFailure('Failed to fetch user profile: ${e.message}'));
     } catch (e) {
-      return Left(UnknownFailure('An error occurred while fetching user profile: ${e.toString()}'));
+      return Left(UnknownFailure(
+          'An error occurred while fetching user profile: ${e.toString()}'));
     }
   }
 
@@ -184,7 +191,8 @@ class AuthRepositoryImpl implements AuthRepository {
 
       // AuthChangeEvent.passwordRecovery should probably not lead to a full UserEntity emission
       // until the user signs in again. For now, we only proceed if signedIn or userUpdated.
-      if (authState.event == AuthChangeEvent.signedIn || authState.event == AuthChangeEvent.userUpdated) {
+      if (authState.event == AuthChangeEvent.signedIn ||
+          authState.event == AuthChangeEvent.userUpdated) {
         try {
           final profileResponse = await supabaseClient
               .from('profiles')
@@ -196,18 +204,19 @@ class AuthRepositoryImpl implements AuthRepository {
             id: user.id,
             phone: profileResponse['phone'] ?? user.phone ?? '',
             name: profileResponse['name'],
-            email: profileResponse['email'] ?? user.email, // Combine sources for email
+            email: profileResponse['email'] ??
+                user.email, // Combine sources for email
             profileUrl: profileResponse['profile_url'],
           );
         } on PostgrestException catch (e) {
           // Log error, and return null as profile is essential.
           // Consider specific error logging or reporting.
-          print('Error fetching profile on authStateChange (PostgrestException: ${e.code}): ${e.message}');
+          print(
+              'Error fetching profile on authStateChange (PostgrestException: ${e.code}): ${e.message}');
           // If profile is not found (PGRST116), it's a critical issue for a logged-in user.
           // Returning null will effectively make the app treat the user as logged out.
           return null;
-        }
-        catch (e) {
+        } catch (e) {
           print('Error fetching profile on authStateChange: $e');
           // For other errors during profile fetch, also return null.
           return null;

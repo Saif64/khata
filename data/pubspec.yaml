@@ -14,10 +14,9 @@ dependencies:
   
   hive: ^2.2.3
 
-  # supabase: ^2.7.0 # Replaced by supabase_flutter for consistency with AuthRepositoryImpl
-  supabase_flutter: ^2.9.0 # Matching presentation layer, or use compatible version.
-                           # Ensure this provides the SupabaseClient AuthRepositoryImpl expects.
-  
+
+  supabase_flutter: ^2.9.0
+
   equatable: ^2.0.7
   fpdart: ^1.1.1
 

@@ -1,5 +1,5 @@
-import 'package:equatable/equatable.dart';
 import 'package:domain/domain.dart'; // For UserEntity
+import 'package:equatable/equatable.dart';
 
 abstract class AuthEvent extends Equatable {
   const AuthEvent();
@@ -48,11 +48,10 @@ class AuthCheckRequested extends AuthEvent {
   const AuthCheckRequested();
 }
 
-// Private event for internal BLoC use
-class _AuthStateChanged extends AuthEvent {
+class AuthStateChanged extends AuthEvent {
   final UserEntity? user;
 
-  const _AuthStateChanged(this.user);
+  const AuthStateChanged(this.user);
 
   @override
   List<Object?> get props => [user];
