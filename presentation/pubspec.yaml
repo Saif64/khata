@@ -28,7 +28,8 @@ dependencies:
   get_it: ^8.0.3
   injectable: ^2.5.0
 
-  
+  fpdart: ^1.1.1 # Added for unit in tests, though AuthRepository uses it in impl.
+
   fl_chart: ^1.0.0
   google_fonts: ^6.2.1
   cupertino_icons: ^1.0.8
@@ -37,5 +38,7 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^6.0.0
-  build_runner: ^2.4.15
-  injectable_generator: ^2.4.0
+  build_runner: ^2.4.15 # Already present
+  injectable_generator: ^2.4.0 # Already present
+  bloc_test: ^9.1.7
+  mockito: ^5.4.4
