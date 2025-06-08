@@ -1,0 +1,38 @@
+name: presentation
+description: The presentation layer for the expense tracker app.
+version: 1.0.0+1
+publish_to: 'none'
+
+environment:
+  sdk: '>=3.0.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  
+  domain:
+    path: ../domain
+  data:
+    path: ../data
+
+  hive_flutter: ^1.1.0
+  
+  flutter_bloc: ^9.1.1
+  equatable: ^2.0.7
+
+  
+  get_it: ^8.0.3
+  injectable: ^2.5.0
+
+  
+  fl_chart: ^1.0.0
+  google_fonts: ^6.2.1
+  cupertino_icons: ^1.0.8
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+  build_runner: ^2.4.15
+  injectable_generator: ^2.4.0
