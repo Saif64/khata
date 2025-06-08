@@ -19,8 +19,9 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     );
 
     on<_AuthStateChanged>((event, emit) {
-      if (event.user != null) {
-        emit(Authenticated(event.user!));
+      final user = event.user; // Assign to a local variable for clarity and stability
+      if (user != null) {
+        emit(Authenticated(user)); // Pass the non-null user
       } else {
         emit(const Unauthenticated());
       }
