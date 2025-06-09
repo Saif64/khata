@@ -1,7 +1,7 @@
 import 'dart:async';
 
-import 'package:bloc/bloc.dart';
 import 'package:domain/domain.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../auth.dart';
 
@@ -15,10 +15,9 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     );
 
     on<AuthStateChanged>((event, emit) {
-      final user =
-          event.user; // Assign to a local variable for clarity and stability
+      final user = event.user;
       if (user != null) {
-        emit(Authenticated(user)); // Pass the non-null user
+        emit(Authenticated(user));
       } else {
         emit(const Unauthenticated());
       }
@@ -50,7 +49,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       );
       failureOrUser.fold(
         (failure) => emit(AuthFailureState(failure.message)),
-        (user) => emit(Authenticated(user)), // AuthStateChanged will also fire
+        (user) => emit(Authenticated(user)),
       );
     });
 
@@ -62,7 +61,25 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       );
       failureOrUser.fold(
         (failure) => emit(AuthFailureState(failure.message)),
-        (user) => emit(Authenticated(user)), // AuthStateChanged will also fire
+        (user) => emit(Authenticated(user)),
+      );
+    });
+
+    on<SignInWithGoogleRequested>((event, emit) async {
+      emit(const AuthLoading());
+      final failureOrUser = await _authRepository.signInWithGoogle();
+      failureOrUser.fold(
+        (failure) => emit(AuthFailureState(failure.message)),
+        (user) => emit(Authenticated(user)),
+      );
+    });
+
+    on<SignInWithFacebookRequested>((event, emit) async {
+      emit(const AuthLoading());
+      final failureOrUser = await _authRepository.signInWithFacebook();
+      failureOrUser.fold(
+        (failure) => emit(AuthFailureState(failure.message)),
+        (user) => emit(Authenticated(user)),
       );
     });
 
@@ -71,9 +88,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       final failureOrVoid = await _authRepository.signOut();
       failureOrVoid.fold(
         (failure) => emit(AuthFailureState(failure.message)),
-        (_) => emit(const Unauthenticated(
-            message:
-                'Successfully signed out.')), // AuthStateChanged will also fire
+        (_) => emit(const Unauthenticated(message: 'Successfully signed out.')),
       );
     });
   }

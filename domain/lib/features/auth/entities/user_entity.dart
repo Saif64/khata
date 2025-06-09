@@ -41,6 +41,16 @@ class UserEntity extends Equatable {
     );
   }
 
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'phone': phone,
+      'name': name,
+      'email': email,
+      'profile_url': profileUrl,
+    };
+  }
+
   factory UserEntity.empty() {
     return const UserEntity(
       id: '',
