@@ -1,17 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:presentation/core/theme/app_theme.dart';
-import 'package:presentation/src/features/auth/provider/auth.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'core/di/injection.dart';
-import 'src/auth_wrapper.dart'; // Import the AuthWrapper
-// Auth BLoC and Screens
-import 'src/features/auth/presentation/screens/sign_in_screen.dart';
-import 'src/features/auth/presentation/screens/sign_up_screen.dart';
-import 'src/features/home/presentation/screens/home_screen.dart';
+import 'core/routes.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -35,21 +29,13 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (context) => di<AuthBloc>()..add(const AuthCheckRequested()),
-      child: MaterialApp(
-        title: 'Khata',
-        theme: AppTheme.lightTheme,
-        darkTheme: AppTheme.darkTheme,
-        themeMode: ThemeMode.system,
-        routes: {
-          '/': (context) => const AuthWrapper(), // Initial route
-          SignInScreen.routeName: (context) => const SignInScreen(),
-          SignUpScreen.routeName: (context) => const SignUpScreen(),
-          HomeScreen.routeName: (context) => const HomeScreen(),
-        },
-        initialRoute: '/',
-      ),
+    return MaterialApp(
+      title: 'Khata',
+      theme: AppTheme.lightTheme,
+      darkTheme: AppTheme.darkTheme,
+      themeMode: ThemeMode.system,
+      routes: Routes.getRoutes(),
+      initialRoute: '/',
     );
   }
 }

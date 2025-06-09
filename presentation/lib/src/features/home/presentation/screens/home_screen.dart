@@ -6,8 +6,6 @@ import '../../../../features/auth/provider/auth.dart'; // Adjusted path
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
 
-  static const routeName = '/home';
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(

@@ -9,8 +9,6 @@ import '../../widgets/social_buttons.dart';
 class SignInScreen extends StatefulWidget {
   const SignInScreen({super.key});
 
-  static const routeName = '/signIn';
-
   @override
   State<SignInScreen> createState() => _SignInScreenState();
 }
