@@ -15,7 +15,7 @@ class _SignUpScreenState extends State<SignUpScreen>
     with TickerProviderStateMixin {
   final _formKey = GlobalKey<FormState>();
   final _nameController = TextEditingController();
-  final _emailController =
+  final _phoneController =
       TextEditingController(); // Changed from _phoneController
   final _passwordController = TextEditingController();
   final _profileUrlController = TextEditingController();
@@ -40,7 +40,7 @@ class _SignUpScreenState extends State<SignUpScreen>
   @override
   void dispose() {
     _nameController.dispose();
-    _emailController.dispose(); // Changed from _phoneController
+    _phoneController.dispose(); // Changed from _phoneController
     _passwordController.dispose();
     _profileUrlController.dispose();
     _animationController.dispose();
@@ -51,10 +51,9 @@ class _SignUpScreenState extends State<SignUpScreen>
     if (_formKey.currentState!.validate()) {
       context.read<AuthBloc>().add(SignUpRequested(
             name: _nameController.text,
-            phone: _emailController
-                .text, // Using email controller for the phone number
+            phone: '${_phoneController.text}@yopmail.com',
             password: _passwordController.text,
-            email: null, // No longer a separate field
+            email: null,
             profileUrl: _profileUrlController.text.isEmpty
                 ? null
                 : _profileUrlController.text,
@@ -174,7 +173,7 @@ class _SignUpScreenState extends State<SignUpScreen>
                                   const SizedBox(height: 16),
                                   TextFormField(
                                     controller:
-                                        _emailController, // Changed from _phoneController
+                                        _phoneController, // Changed from _phoneController
                                     decoration: InputDecoration(
                                       labelText: 'Email', // Updated Label
                                       prefixIcon: Icon(

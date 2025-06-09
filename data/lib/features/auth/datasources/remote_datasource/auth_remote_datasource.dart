@@ -44,7 +44,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   }) async {
     try {
       final response = await supabaseClient.auth.signUp(
-        email: phone, // Continue using phone for email-based auth
+        email: phone,
         password: password,
         data: {
           'name': name,
@@ -142,9 +142,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       if (!success) {
         return Left(ServerFailure('Google sign-in was not successful.'));
       }
-      // The user will be available in the auth state changes stream
-      // For now, we can't return a UserEntity directly from here
-      // But we need to, so we'll listen to the stream for the first user event
+
       final user = await authStateChanges.first;
       if (user != null) {
         return Right(user);
@@ -252,8 +250,6 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
             profileUrl: profileResponse['profile_url'],
           );
         } on PostgrestException {
-          // Profile might not exist yet for a new OAuth user
-          // Let's create it
           final newProfile = {
             'id': user.id,
             'name': user.userMetadata?['full_name'] ?? 'No Name',

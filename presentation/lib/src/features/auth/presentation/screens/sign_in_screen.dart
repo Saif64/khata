@@ -16,7 +16,7 @@ class SignInScreen extends StatefulWidget {
 class _SignInScreenState extends State<SignInScreen>
     with TickerProviderStateMixin {
   final _formKey = GlobalKey<FormState>();
-  final _emailController = TextEditingController();
+  final _phoneController = TextEditingController();
   final _passwordController = TextEditingController();
   bool _isLoading = false;
   bool _obscurePassword = true;
@@ -38,7 +38,7 @@ class _SignInScreenState extends State<SignInScreen>
 
   @override
   void dispose() {
-    _emailController.dispose();
+    _phoneController.dispose();
     _passwordController.dispose();
     _animationController.dispose();
     super.dispose();
@@ -47,7 +47,7 @@ class _SignInScreenState extends State<SignInScreen>
   void _signIn(BuildContext context) {
     if (_formKey.currentState!.validate()) {
       context.read<AuthBloc>().add(SignInWithEmailRequested(
-            email: _emailController.text,
+            email: "${_phoneController.text}@yopmail.com",
             password: _passwordController.text,
           ));
     }
@@ -158,16 +158,16 @@ class _SignInScreenState extends State<SignInScreen>
                               child: Column(
                                 children: [
                                   TextFormField(
-                                    controller: _emailController,
+                                    controller: _phoneController,
                                     decoration: InputDecoration(
-                                      labelText: 'Email',
+                                      labelText: 'Phone',
                                       prefixIcon: Icon(
                                         Icons.email_outlined,
                                         color: colorScheme.primary,
                                       ),
                                       fillColor: colorScheme.inputFill,
                                     ),
-                                    keyboardType: TextInputType.emailAddress,
+                                    keyboardType: TextInputType.phone,
                                     validator: (value) {
                                       if (value == null || value.isEmpty) {
                                         return 'Please enter your email or phone number';

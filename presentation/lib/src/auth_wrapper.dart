@@ -16,11 +16,9 @@ class AuthWrapper extends StatelessWidget {
           return const HomeScreen();
         }
         if (state is Unauthenticated || state is AuthFailureState) {
-          // If AuthFailureState, could show SignInScreen with an error,
-          // but for now, SignInScreen handles showing its own errors via SnackBar.
           return const SignInScreen();
         }
-        // AuthInitial or AuthLoading
+
         return const Scaffold(
           body: Center(child: CircularProgressIndicator()),
         );
