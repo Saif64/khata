@@ -313,6 +313,13 @@
             </list>
           </value>
         </entry>
+        <entry key="font_awesome_flutter">
+          <value>
+            <list>
+              <option value="$USER_HOME$/.pub-cache/hosted/pub.dev/font_awesome_flutter-10.8.0/lib" />
+            </list>
+          </value>
+        </entry>
         <entry key="fpdart">
           <value>
             <list>
@@ -1057,6 +1064,7 @@
       <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dev/flutter_bloc-9.1.1/lib" />
       <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dev/flutter_dotenv-5.2.1/lib" />
       <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dev/flutter_lints-6.0.0/lib" />
+      <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dev/font_awesome_flutter-10.8.0/lib" />
       <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dev/fpdart-1.1.1/lib" />
       <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dev/frontend_server_client-4.0.0/lib" />
       <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dev/functions_client-2.4.2/lib" />

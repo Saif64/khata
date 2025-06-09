@@ -2,24 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 extension ColorSchemeExtension on ColorScheme {
-  Color get gradient1 => brightness == Brightness.light
-      ? const Color(0xFF4FA095)
-      : const Color(0xFF453462);
-
-  Color get gradient2 => brightness == Brightness.light
-      ? const Color(0xFF6B8E6B)
-      : const Color(0xFF4FA095);
-
-  Color get cardBackground => brightness == Brightness.light
-      ? const Color(0xFFF6F6C9).withOpacity(0.95)
-      : const Color(0xFF2A2A2A).withOpacity(0.95);
+  Color get cardBackground =>
+      brightness == Brightness.light ? Colors.white : const Color(0xFF2A2A2A);
 
   Color get inputFill => brightness == Brightness.light
-      ? const Color(0xFFDAD1C2).withOpacity(0.7)
-      : const Color(0xFF374151).withOpacity(0.8);
+      ? const Color(0xFFF3F4F6)
+      : const Color(0xFF374151);
 
   Color get socialButtonBg => brightness == Brightness.light
-      ? const Color(0xFFDAD1C2)
+      ? const Color(0xFFE5E7EB)
       : const Color(0xFF374151);
 
   Color get accent => const Color(0xFF453462);
@@ -35,13 +26,13 @@ class AppTheme {
       brightness: Brightness.light,
       primary: const Color(0xFF4FA095),
       secondary: const Color(0xFF453462),
-      surface: const Color(0xFFF6F6C9),
-      onSurface: const Color(0xFF453462),
+      surface: const Color(0xFFF9FAFB),
+      onSurface: const Color(0xFF1F2937),
     ),
     textTheme: GoogleFonts.figtreeTextTheme(ThemeData.light().textTheme),
     fontFamily: GoogleFonts.figtree().fontFamily,
     useMaterial3: true,
-    scaffoldBackgroundColor: Colors.transparent,
+    scaffoldBackgroundColor: const Color(0xFFF9FAFB),
     appBarTheme: const AppBarTheme(
       elevation: 0,
       backgroundColor: Colors.transparent,
@@ -59,7 +50,7 @@ class AppTheme {
       ),
       enabledBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(16.0),
-        borderSide: const BorderSide(color: Color(0xFFDAD1C2), width: 1),
+        borderSide: const BorderSide(color: Color(0xFFE5E7EB), width: 1),
       ),
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(16.0),
@@ -105,7 +96,7 @@ class AppTheme {
     textTheme: GoogleFonts.figtreeTextTheme(ThemeData.dark().textTheme),
     fontFamily: GoogleFonts.figtree().fontFamily,
     useMaterial3: true,
-    scaffoldBackgroundColor: Colors.transparent,
+    scaffoldBackgroundColor: const Color(0xFF111827),
     appBarTheme: const AppBarTheme(
       elevation: 0,
       backgroundColor: Colors.transparent,

@@ -68,6 +68,7 @@ class _SignUpScreenState extends State<SignUpScreen>
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
+    final isDarkMode = theme.brightness == Brightness.dark;
 
     return Scaffold(
       extendBodyBehindAppBar: true,
@@ -82,279 +83,250 @@ class _SignUpScreenState extends State<SignUpScreen>
           onPressed: () => Navigator.pop(context),
         ),
       ),
-      body: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topRight,
-            end: Alignment.bottomLeft,
-            colors: [
-              colorScheme.gradient2,
-              colorScheme.gradient1,
-            ],
-          ),
-        ),
-        child: BlocListener<AuthBloc, AuthState>(
-          listener: (context, state) {
-            setState(() {
-              _isLoading = state is AuthLoading;
-            });
+      body: BlocListener<AuthBloc, AuthState>(
+        listener: (context, state) {
+          setState(() {
+            _isLoading = state is AuthLoading;
+          });
 
-            if (state is Authenticated) {
-              Navigator.pushReplacementNamed(context, '/home');
-            } else if (state is AuthFailureState) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text(state.message),
-                  backgroundColor: colorScheme.error,
-                  behavior: SnackBarBehavior.floating,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
+          if (state is Authenticated) {
+            Navigator.pushReplacementNamed(context, '/home');
+          } else if (state is AuthFailureState) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(state.message),
+                backgroundColor: colorScheme.error,
+                behavior: SnackBarBehavior.floating,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
                 ),
-              );
-            }
-          },
-          child: SafeArea(
-            child: FadeTransition(
-              opacity: _fadeAnimation,
-              child: Padding(
-                padding: const EdgeInsets.all(24.0),
-                child: Column(
-                  children: [
-                    Expanded(
-                      child: SingleChildScrollView(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.stretch,
-                          children: [
-                            const SizedBox(height: 20),
-                            // Welcome Text
-                            Text(
-                              'Create Account',
-                              style: theme.textTheme.headlineLarge?.copyWith(
-                                color: Colors.white,
-                                fontWeight: FontWeight.bold,
-                              ),
-                              textAlign: TextAlign.center,
+              ),
+            );
+          }
+        },
+        child: SafeArea(
+          child: FadeTransition(
+            opacity: _fadeAnimation,
+            child: Padding(
+              padding: const EdgeInsets.all(24.0),
+              child: Column(
+                children: [
+                  Expanded(
+                    child: SingleChildScrollView(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          const SizedBox(height: 20),
+                          // Welcome Text
+                          Text(
+                            'Create Account',
+                            style: theme.textTheme.headlineLarge?.copyWith(
+                              color: isDarkMode ? Colors.white : Colors.black,
+                              fontWeight: FontWeight.bold,
                             ),
-                            const SizedBox(height: 8),
-                            Text(
-                              'Join us and get started',
-                              style: theme.textTheme.bodyLarge?.copyWith(
-                                color: Colors.white.withOpacity(0.8),
-                              ),
-                              textAlign: TextAlign.center,
+                            textAlign: TextAlign.center,
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            'Join us and get started',
+                            style: theme.textTheme.bodyLarge?.copyWith(
+                              color: isDarkMode
+                                  ? Colors.white.withOpacity(0.8)
+                                  : Colors.black.withOpacity(0.6),
                             ),
-                            const SizedBox(height: 32),
+                            textAlign: TextAlign.center,
+                          ),
+                          const SizedBox(height: 32),
 
-                            // Form Card
-                            Container(
-                              padding: const EdgeInsets.all(24),
-                              decoration: BoxDecoration(
-                                color: colorScheme.cardBackground,
-                                borderRadius: BorderRadius.circular(24),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Colors.black.withOpacity(0.1),
-                                    blurRadius: 20,
-                                    offset: const Offset(0, 10),
+                          // Form Card
+                          Container(
+                            padding: const EdgeInsets.all(24),
+                            decoration: BoxDecoration(
+                              color: colorScheme.cardBackground,
+                              borderRadius: BorderRadius.circular(24),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withOpacity(0.05),
+                                  blurRadius: 20,
+                                  offset: const Offset(0, 10),
+                                ),
+                              ],
+                            ),
+                            child: Form(
+                              key: _formKey,
+                              child: Column(
+                                children: [
+                                  TextFormField(
+                                    controller: _nameController,
+                                    decoration: InputDecoration(
+                                      labelText: 'Full Name',
+                                      prefixIcon: Icon(
+                                        Icons.person_outline,
+                                        color: colorScheme.primary,
+                                      ),
+                                      fillColor: colorScheme.inputFill,
+                                    ),
+                                    validator: (value) {
+                                      if (value == null || value.isEmpty) {
+                                        return 'Please enter your name';
+                                      }
+                                      return null;
+                                    },
                                   ),
-                                ],
-                              ),
-                              child: Form(
-                                key: _formKey,
-                                child: Column(
-                                  children: [
-                                    TextFormField(
-                                      controller: _nameController,
-                                      decoration: InputDecoration(
-                                        labelText: 'Full Name',
-                                        prefixIcon: Icon(
-                                          Icons.person_outline,
+                                  const SizedBox(height: 16),
+                                  TextFormField(
+                                    controller: _phoneController,
+                                    decoration: InputDecoration(
+                                      labelText: 'Phone Number',
+                                      prefixIcon: Icon(
+                                        Icons.phone_outlined,
+                                        color: colorScheme.primary,
+                                      ),
+                                      fillColor: colorScheme.inputFill,
+                                    ),
+                                    keyboardType: TextInputType.phone,
+                                    validator: (value) {
+                                      if (value == null || value.isEmpty) {
+                                        return 'Please enter your phone number';
+                                      }
+                                      return null;
+                                    },
+                                  ),
+                                  const SizedBox(height: 16),
+                                  TextFormField(
+                                    controller: _emailController,
+                                    decoration: InputDecoration(
+                                      labelText: 'Email (Optional)',
+                                      prefixIcon: Icon(
+                                        Icons.email_outlined,
+                                        color: colorScheme.primary,
+                                      ),
+                                      fillColor: colorScheme.inputFill,
+                                    ),
+                                    keyboardType: TextInputType.emailAddress,
+                                  ),
+                                  const SizedBox(height: 16),
+                                  TextFormField(
+                                    controller: _passwordController,
+                                    decoration: InputDecoration(
+                                      labelText: 'Password',
+                                      prefixIcon: Icon(
+                                        Icons.lock_outline,
+                                        color: colorScheme.primary,
+                                      ),
+                                      suffixIcon: IconButton(
+                                        icon: Icon(
+                                          _obscurePassword
+                                              ? Icons.visibility_off_outlined
+                                              : Icons.visibility_outlined,
                                           color: colorScheme.primary,
                                         ),
-                                        fillColor: colorScheme.inputFill,
+                                        onPressed: () {
+                                          setState(() {
+                                            _obscurePassword =
+                                                !_obscurePassword;
+                                          });
+                                        },
                                       ),
-                                      validator: (value) {
-                                        if (value == null || value.isEmpty) {
-                                          return 'Please enter your name';
-                                        }
-                                        return null;
-                                      },
+                                      fillColor: colorScheme.inputFill,
                                     ),
-                                    const SizedBox(height: 16),
-                                    TextFormField(
-                                      controller: _phoneController,
-                                      decoration: InputDecoration(
-                                        labelText: 'Phone Number',
-                                        prefixIcon: Icon(
-                                          Icons.phone_outlined,
-                                          color: colorScheme.primary,
-                                        ),
-                                        fillColor: colorScheme.inputFill,
+                                    obscureText: _obscurePassword,
+                                    validator: (value) {
+                                      if (value == null || value.isEmpty) {
+                                        return 'Please enter a password';
+                                      }
+                                      if (value.length < 6) {
+                                        return 'Password must be at least 6 characters';
+                                      }
+                                      return null;
+                                    },
+                                  ),
+                                  const SizedBox(height: 16),
+                                  TextFormField(
+                                    controller: _profileUrlController,
+                                    decoration: InputDecoration(
+                                      labelText: 'Profile URL (Optional)',
+                                      prefixIcon: Icon(
+                                        Icons.image_outlined,
+                                        color: colorScheme.primary,
                                       ),
-                                      keyboardType: TextInputType.phone,
-                                      validator: (value) {
-                                        if (value == null || value.isEmpty) {
-                                          return 'Please enter your phone number';
-                                        }
-                                        return null;
-                                      },
+                                      fillColor: colorScheme.inputFill,
                                     ),
-                                    const SizedBox(height: 16),
-                                    TextFormField(
-                                      controller: _emailController,
-                                      decoration: InputDecoration(
-                                        labelText: 'Email (Optional)',
-                                        prefixIcon: Icon(
-                                          Icons.email_outlined,
-                                          color: colorScheme.primary,
-                                        ),
-                                        fillColor: colorScheme.inputFill,
-                                      ),
-                                      keyboardType: TextInputType.emailAddress,
-                                    ),
-                                    const SizedBox(height: 16),
-                                    TextFormField(
-                                      controller: _passwordController,
-                                      decoration: InputDecoration(
-                                        labelText: 'Password',
-                                        prefixIcon: Icon(
-                                          Icons.lock_outline,
-                                          color: colorScheme.primary,
-                                        ),
-                                        suffixIcon: IconButton(
-                                          icon: Icon(
-                                            _obscurePassword
-                                                ? Icons.visibility_off_outlined
-                                                : Icons.visibility_outlined,
-                                            color: colorScheme.primary,
-                                          ),
-                                          onPressed: () {
-                                            setState(() {
-                                              _obscurePassword =
-                                                  !_obscurePassword;
-                                            });
-                                          },
-                                        ),
-                                        fillColor: colorScheme.inputFill,
-                                      ),
-                                      obscureText: _obscurePassword,
-                                      validator: (value) {
-                                        if (value == null || value.isEmpty) {
-                                          return 'Please enter a password';
-                                        }
-                                        if (value.length < 6) {
-                                          return 'Password must be at least 6 characters';
-                                        }
-                                        return null;
-                                      },
-                                    ),
-                                    const SizedBox(height: 16),
-                                    TextFormField(
-                                      controller: _profileUrlController,
-                                      decoration: InputDecoration(
-                                        labelText: 'Profile URL (Optional)',
-                                        prefixIcon: Icon(
-                                          Icons.image_outlined,
-                                          color: colorScheme.primary,
-                                        ),
-                                        fillColor: colorScheme.inputFill,
-                                      ),
-                                    ),
-                                    const SizedBox(height: 32),
+                                  ),
+                                  const SizedBox(height: 32),
 
-                                    // Sign Up Button
-                                    SizedBox(
-                                      width: double.infinity,
-                                      child: _isLoading
-                                          ? Container(
-                                              height: 56,
-                                              decoration: BoxDecoration(
-                                                gradient: LinearGradient(
-                                                  colors: [
-                                                    colorScheme.primary,
-                                                    colorScheme.secondary,
-                                                  ],
-                                                ),
-                                                borderRadius:
-                                                    BorderRadius.circular(16),
-                                              ),
-                                              child: const Center(
-                                                child: SizedBox(
-                                                  width: 24,
-                                                  height: 24,
-                                                  child:
-                                                      CircularProgressIndicator(
-                                                    strokeWidth: 2,
-                                                    valueColor:
-                                                        AlwaysStoppedAnimation<
-                                                            Color>(
-                                                      Colors.white,
-                                                    ),
+                                  // Sign Up Button
+                                  SizedBox(
+                                    width: double.infinity,
+                                    child: _isLoading
+                                        ? Container(
+                                            height: 56,
+                                            decoration: BoxDecoration(
+                                              color: colorScheme.primary,
+                                              borderRadius:
+                                                  BorderRadius.circular(16),
+                                            ),
+                                            child: const Center(
+                                              child: SizedBox(
+                                                width: 24,
+                                                height: 24,
+                                                child:
+                                                    CircularProgressIndicator(
+                                                  strokeWidth: 2,
+                                                  valueColor:
+                                                      AlwaysStoppedAnimation<
+                                                          Color>(
+                                                    Colors.white,
                                                   ),
                                                 ),
                                               ),
-                                            )
-                                          : Container(
-                                              decoration: BoxDecoration(
-                                                gradient: LinearGradient(
-                                                  colors: [
-                                                    colorScheme.primary,
-                                                    colorScheme.secondary,
-                                                  ],
-                                                ),
-                                                borderRadius:
-                                                    BorderRadius.circular(16),
-                                              ),
-                                              child: ElevatedButton(
-                                                onPressed: () =>
-                                                    _signUp(context),
-                                                style: ElevatedButton.styleFrom(
-                                                  backgroundColor:
-                                                      Colors.transparent,
-                                                  foregroundColor: Colors.white,
-                                                  shadowColor:
-                                                      Colors.transparent,
-                                                ),
-                                                child: const Text(
-                                                    'Create Account'),
-                                              ),
                                             ),
-                                    ),
-                                  ],
-                                ),
+                                          )
+                                        : ElevatedButton(
+                                            onPressed: () => _signUp(context),
+                                            style: ElevatedButton.styleFrom(
+                                              backgroundColor:
+                                                  colorScheme.primary,
+                                              foregroundColor: Colors.white,
+                                            ),
+                                            child: const Text('Create Account'),
+                                          ),
+                                  ),
+                                ],
                               ),
                             ),
-                          ],
-                        ),
-                      ),
-                    ),
-
-                    // Sign In Link
-                    TextButton(
-                      onPressed: () {
-                        Navigator.pop(context);
-                      },
-                      child: RichText(
-                        text: TextSpan(
-                          text: "Already have an account? ",
-                          style: theme.textTheme.bodyMedium?.copyWith(
-                            color: Colors.white.withOpacity(0.8),
                           ),
-                          children: [
-                            TextSpan(
-                              text: 'Sign In',
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                          ],
-                        ),
+                        ],
                       ),
                     ),
-                  ],
-                ),
+                  ),
+
+                  // Sign In Link
+                  TextButton(
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
+                    child: RichText(
+                      text: TextSpan(
+                        text: "Already have an account? ",
+                        style: theme.textTheme.bodyMedium?.copyWith(
+                          color: isDarkMode
+                              ? Colors.white.withOpacity(0.8)
+                              : Colors.black.withOpacity(0.6),
+                        ),
+                        children: [
+                          TextSpan(
+                            text: 'Sign In',
+                            style: TextStyle(
+                              color: isDarkMode ? Colors.white : Colors.black,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
           ),

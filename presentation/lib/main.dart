@@ -30,10 +30,6 @@ Future<void> main() async {
   runApp(const MyApp());
 }
 
-// supBaseClient can be accessed via locator if registered, or directly if needed by legacy code.
-// It's good practice for new code (like AuthRepositoryImpl) to get it via DI.
-final supBaseClient = Supabase.instance.client;
-
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
