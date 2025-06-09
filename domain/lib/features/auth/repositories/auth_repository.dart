@@ -1,4 +1,5 @@
 import 'package:fpdart/fpdart.dart';
+
 import '../entities/user_entity.dart';
 import '../failures/auth_failure.dart';
 
@@ -11,10 +12,14 @@ abstract class AuthRepository {
     String? profileUrl,
   });
 
-  Future<Either<AuthFailure, UserEntity>> signInWithPhone({
-    required String phone,
+  Future<Either<AuthFailure, UserEntity>> signInWithEmail({
+    required String email,
     required String password,
   });
+
+  Future<Either<AuthFailure, UserEntity>> signInWithGoogle();
+
+  Future<Either<AuthFailure, UserEntity>> signInWithFacebook();
 
   Future<Either<AuthFailure, void>> signOut();
 

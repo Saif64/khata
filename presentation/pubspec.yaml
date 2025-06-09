@@ -29,6 +29,7 @@ dependencies:
 
 
   fpdart: ^1.1.1
+  font_awesome_flutter: ^10.8.0
 
   fl_chart: ^1.0.0
   google_fonts: ^6.2.1

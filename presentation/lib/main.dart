@@ -3,12 +3,12 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:presentation/core/theme/app_theme.dart';
+import 'package:presentation/src/features/auth/provider/auth.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'core/di/injection.dart';
 import 'src/auth_wrapper.dart'; // Import the AuthWrapper
 // Auth BLoC and Screens
-import 'src/features/auth/application/auth.dart';
 import 'src/features/auth/presentation/screens/sign_in_screen.dart';
 import 'src/features/auth/presentation/screens/sign_up_screen.dart';
 import 'src/features/home/presentation/screens/home_screen.dart';
@@ -24,15 +24,11 @@ Future<void> main() async {
   );
 
   await Hive.initFlutter();
-  // configureDependencies registers dependencies, including potentially SupabaseClient via a module
+  await Hive.openBox<String>('userBox');
   setupLocator();
 
   runApp(const MyApp());
 }
-
-// supBaseClient can be accessed via locator if registered, or directly if needed by legacy code.
-// It's good practice for new code (like AuthRepositoryImpl) to get it via DI.
-final supBaseClient = Supabase.instance.client;
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});

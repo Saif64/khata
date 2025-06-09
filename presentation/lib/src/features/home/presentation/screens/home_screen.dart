@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../../../../features/auth/application/auth.dart'; // Adjusted path
+
+import '../../../../features/auth/provider/auth.dart'; // Adjusted path
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -12,6 +13,7 @@ class HomeScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Home'),
+        automaticallyImplyLeading: false,
         actions: [
           IconButton(
             icon: const Icon(Icons.logout),
@@ -26,10 +28,11 @@ class HomeScreen extends StatelessWidget {
         listener: (context, state) {
           if (state is Unauthenticated) {
             // Navigate back to SignInScreen after sign out
-            Navigator.pushNamedAndRemoveUntil(context, '/signIn', (route) => false);
+            Navigator.pushNamedAndRemoveUntil(
+                context, '/signIn', (route) => false);
           } else if (state is AuthFailureState) {
             // Optionally show error during sign out, though less common
-             ScaffoldMessenger.of(context).showSnackBar(
+            ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(content: Text("Sign out failed: ${state.message}")),
             );
           }
