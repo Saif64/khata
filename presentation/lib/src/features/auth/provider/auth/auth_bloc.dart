@@ -53,10 +53,10 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       );
     });
 
-    on<SignInWithPhoneRequested>((event, emit) async {
+    on<SignInWithEmailRequested>((event, emit) async {
       emit(const AuthLoading());
-      final failureOrUser = await _authRepository.signInWithPhone(
-        phone: event.phone,
+      final failureOrUser = await _authRepository.signInWithEmail(
+        email: event.email,
         password: event.password,
       );
       failureOrUser.fold(

@@ -33,12 +33,12 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   @override
-  Future<Either<AuthFailure, UserEntity>> signInWithPhone({
-    required String phone,
+  Future<Either<AuthFailure, UserEntity>> signInWithEmail({
+    required String email,
     required String password,
   }) async {
-    final failureOrUser = await remoteDataSource.signInWithPhone(
-      phone: phone,
+    final failureOrUser = await remoteDataSource.signInWithEmail(
+      email: email,
       password: password,
     );
     failureOrUser.fold(

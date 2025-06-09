@@ -12,8 +12,8 @@ abstract class AuthRepository {
     String? profileUrl,
   });
 
-  Future<Either<AuthFailure, UserEntity>> signInWithPhone({
-    required String phone,
+  Future<Either<AuthFailure, UserEntity>> signInWithEmail({
+    required String email,
     required String password,
   });
 

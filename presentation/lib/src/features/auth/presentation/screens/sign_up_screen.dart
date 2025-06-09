@@ -17,9 +17,9 @@ class _SignUpScreenState extends State<SignUpScreen>
     with TickerProviderStateMixin {
   final _formKey = GlobalKey<FormState>();
   final _nameController = TextEditingController();
-  final _phoneController = TextEditingController();
+  final _emailController =
+      TextEditingController(); // Changed from _phoneController
   final _passwordController = TextEditingController();
-  final _emailController = TextEditingController();
   final _profileUrlController = TextEditingController();
   bool _isLoading = false;
   bool _obscurePassword = true;
@@ -42,9 +42,8 @@ class _SignUpScreenState extends State<SignUpScreen>
   @override
   void dispose() {
     _nameController.dispose();
-    _phoneController.dispose();
+    _emailController.dispose(); // Changed from _phoneController
     _passwordController.dispose();
-    _emailController.dispose();
     _profileUrlController.dispose();
     _animationController.dispose();
     super.dispose();
@@ -54,9 +53,10 @@ class _SignUpScreenState extends State<SignUpScreen>
     if (_formKey.currentState!.validate()) {
       context.read<AuthBloc>().add(SignUpRequested(
             name: _nameController.text,
-            phone: _phoneController.text,
+            phone: _emailController
+                .text, // Using email controller for the phone number
             password: _passwordController.text,
-            email: _emailController.text.isEmpty ? null : _emailController.text,
+            email: null, // No longer a separate field
             profileUrl: _profileUrlController.text.isEmpty
                 ? null
                 : _profileUrlController.text,
@@ -175,35 +175,24 @@ class _SignUpScreenState extends State<SignUpScreen>
                                   ),
                                   const SizedBox(height: 16),
                                   TextFormField(
-                                    controller: _phoneController,
+                                    controller:
+                                        _emailController, // Changed from _phoneController
                                     decoration: InputDecoration(
-                                      labelText: 'Phone Number',
+                                      labelText: 'Email', // Updated Label
                                       prefixIcon: Icon(
-                                        Icons.phone_outlined,
+                                        Icons.email_outlined, // Changed Icon
                                         color: colorScheme.primary,
                                       ),
                                       fillColor: colorScheme.inputFill,
                                     ),
-                                    keyboardType: TextInputType.phone,
+                                    keyboardType: TextInputType
+                                        .phone, // Keyboard type remains phone
                                     validator: (value) {
                                       if (value == null || value.isEmpty) {
                                         return 'Please enter your phone number';
                                       }
                                       return null;
                                     },
-                                  ),
-                                  const SizedBox(height: 16),
-                                  TextFormField(
-                                    controller: _emailController,
-                                    decoration: InputDecoration(
-                                      labelText: 'Email (Optional)',
-                                      prefixIcon: Icon(
-                                        Icons.email_outlined,
-                                        color: colorScheme.primary,
-                                      ),
-                                      fillColor: colorScheme.inputFill,
-                                    ),
-                                    keyboardType: TextInputType.emailAddress,
                                   ),
                                   const SizedBox(height: 16),
                                   TextFormField(

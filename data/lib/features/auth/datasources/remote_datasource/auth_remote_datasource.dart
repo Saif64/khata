@@ -13,8 +13,8 @@ abstract class AuthRemoteDataSource {
     String? profileUrl,
   });
 
-  Future<Either<AuthFailure, UserEntity>> signInWithPhone({
-    required String phone,
+  Future<Either<AuthFailure, UserEntity>> signInWithEmail({
+    required String email,
     required String password,
   });
 
@@ -44,8 +44,14 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   }) async {
     try {
       final response = await supabaseClient.auth.signUp(
-        phone: phone,
+        email: phone, // Continue using phone for email-based auth
         password: password,
+        data: {
+          'name': name,
+          'phone': phone,
+          'email': email,
+          'profile_url': profileUrl,
+        },
       );
 
       if (response.user == null) {
@@ -53,18 +59,8 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
             'User with this phone already exists or another error occurred.'));
       }
 
-      final userId = response.user!.id;
-
-      await supabaseClient.from('profiles').insert({
-        'id': userId,
-        'name': name,
-        'phone': phone,
-        'email': email,
-        'profile_url': profileUrl,
-      });
-
       return Right(UserEntity(
-        id: userId,
+        id: response.user!.id,
         name: name,
         phone: phone,
         email: email,
@@ -86,18 +82,18 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   }
 
   @override
-  Future<Either<AuthFailure, UserEntity>> signInWithPhone({
-    required String phone,
+  Future<Either<AuthFailure, UserEntity>> signInWithEmail({
+    required String email,
     required String password,
   }) async {
     try {
       final response = await supabaseClient.auth.signInWithPassword(
-        phone: phone,
+        email: email,
         password: password,
       );
 
       if (response.user == null) {
-        return Left(InvalidCredentialsFailure('Invalid phone or password.'));
+        return Left(InvalidCredentialsFailure('Invalid email or password.'));
       }
 
       final userId = response.user!.id;
@@ -121,7 +117,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       ));
     } on AuthException catch (e) {
       if (e.message.toLowerCase().contains('invalid login credentials')) {
-        return Left(InvalidCredentialsFailure('Invalid phone or password.'));
+        return Left(InvalidCredentialsFailure('Invalid email or password.'));
       }
       if (e.message.toLowerCase().contains('network')) {
         return Left(NetworkFailure('Please check your internet connection.'));
