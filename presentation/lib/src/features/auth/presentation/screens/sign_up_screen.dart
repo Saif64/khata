@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:presentation/core/theme/app_theme.dart';
 
 import '../../provider/auth.dart';
@@ -15,8 +16,7 @@ class _SignUpScreenState extends State<SignUpScreen>
     with TickerProviderStateMixin {
   final _formKey = GlobalKey<FormState>();
   final _nameController = TextEditingController();
-  final _phoneController =
-      TextEditingController(); // Changed from _phoneController
+  final _phoneController = TextEditingController();
   final _passwordController = TextEditingController();
   final _profileUrlController = TextEditingController();
   bool _isLoading = false;
@@ -40,7 +40,7 @@ class _SignUpScreenState extends State<SignUpScreen>
   @override
   void dispose() {
     _nameController.dispose();
-    _phoneController.dispose(); // Changed from _phoneController
+    _phoneController.dispose();
     _passwordController.dispose();
     _profileUrlController.dispose();
     _animationController.dispose();
@@ -74,7 +74,7 @@ class _SignUpScreenState extends State<SignUpScreen>
         elevation: 0,
         leading: IconButton(
           icon: Icon(
-            Icons.arrow_back_ios_new,
+            FontAwesomeIcons.arrowLeftLong,
             color: theme.appBarTheme.foregroundColor,
           ),
           onPressed: () => Navigator.pop(context),
@@ -114,7 +114,6 @@ class _SignUpScreenState extends State<SignUpScreen>
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
                           const SizedBox(height: 20),
-                          // Welcome Text
                           Text(
                             'Create Account',
                             style: theme.textTheme.headlineLarge?.copyWith(
@@ -134,8 +133,6 @@ class _SignUpScreenState extends State<SignUpScreen>
                             textAlign: TextAlign.center,
                           ),
                           const SizedBox(height: 32),
-
-                          // Form Card
                           Container(
                             padding: const EdgeInsets.all(24),
                             decoration: BoxDecoration(
@@ -158,7 +155,7 @@ class _SignUpScreenState extends State<SignUpScreen>
                                     decoration: InputDecoration(
                                       labelText: 'Full Name',
                                       prefixIcon: Icon(
-                                        Icons.person_outline,
+                                        FontAwesomeIcons.userLock,
                                         color: colorScheme.primary,
                                       ),
                                       fillColor: colorScheme.inputFill,
@@ -172,18 +169,16 @@ class _SignUpScreenState extends State<SignUpScreen>
                                   ),
                                   const SizedBox(height: 16),
                                   TextFormField(
-                                    controller:
-                                        _phoneController, // Changed from _phoneController
+                                    controller: _phoneController,
                                     decoration: InputDecoration(
-                                      labelText: 'Email', // Updated Label
+                                      labelText: 'Phone',
                                       prefixIcon: Icon(
-                                        Icons.email_outlined, // Changed Icon
+                                        FontAwesomeIcons.phone,
                                         color: colorScheme.primary,
                                       ),
                                       fillColor: colorScheme.inputFill,
                                     ),
-                                    keyboardType: TextInputType
-                                        .phone, // Keyboard type remains phone
+                                    keyboardType: TextInputType.phone,
                                     validator: (value) {
                                       if (value == null || value.isEmpty) {
                                         return 'Please enter your phone number';
@@ -197,14 +192,14 @@ class _SignUpScreenState extends State<SignUpScreen>
                                     decoration: InputDecoration(
                                       labelText: 'Password',
                                       prefixIcon: Icon(
-                                        Icons.lock_outline,
+                                        FontAwesomeIcons.fingerprint,
                                         color: colorScheme.primary,
                                       ),
                                       suffixIcon: IconButton(
                                         icon: Icon(
                                           _obscurePassword
-                                              ? Icons.visibility_off_outlined
-                                              : Icons.visibility_outlined,
+                                              ? FontAwesomeIcons.eyeSlash
+                                              : FontAwesomeIcons.eye,
                                           color: colorScheme.primary,
                                         ),
                                         onPressed: () {
@@ -227,21 +222,7 @@ class _SignUpScreenState extends State<SignUpScreen>
                                       return null;
                                     },
                                   ),
-                                  const SizedBox(height: 16),
-                                  TextFormField(
-                                    controller: _profileUrlController,
-                                    decoration: InputDecoration(
-                                      labelText: 'Profile URL (Optional)',
-                                      prefixIcon: Icon(
-                                        Icons.image_outlined,
-                                        color: colorScheme.primary,
-                                      ),
-                                      fillColor: colorScheme.inputFill,
-                                    ),
-                                  ),
                                   const SizedBox(height: 32),
-
-                                  // Sign Up Button
                                   SizedBox(
                                     width: double.infinity,
                                     child: _isLoading
@@ -286,8 +267,6 @@ class _SignUpScreenState extends State<SignUpScreen>
                       ),
                     ),
                   ),
-
-                  // Sign In Link
                   TextButton(
                     onPressed: () {
                       Navigator.pop(context);

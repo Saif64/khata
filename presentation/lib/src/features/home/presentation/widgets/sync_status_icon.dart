@@ -22,11 +22,10 @@ class SyncStatusIcon extends StatelessWidget {
                     child: CircularProgressIndicator(strokeWidth: 2.0)),
               );
             case 'Error':
-              return const Icon(FontAwesomeIcons.cloudArrowDown,
+              return const Icon(FontAwesomeIcons.arrowsRotate,
                   color: Colors.red);
             default:
-              return const Icon(FontAwesomeIcons.solidCircleCheck,
-                  color: Colors.green);
+              return Container();
           }
         }
         return const SizedBox.shrink();

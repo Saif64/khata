@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
-class ModernSummaryWidget extends StatelessWidget {
+class SummaryWidget extends StatelessWidget {
   final double todaysSales;
   final double todaysSpending;
   final double yesterdaysSales;
   final double yesterdaysSpending;
 
-  const ModernSummaryWidget({
+  const SummaryWidget({
     super.key,
     required this.todaysSales,
     required this.todaysSpending,
@@ -60,7 +60,7 @@ class ModernSummaryWidget extends StatelessWidget {
                     ),
                   ),
                   Icon(
-                    FontAwesomeIcons.chartLine,
+                    FontAwesomeIcons.chartGantt,
                     color: Colors.white.withOpacity(0.8),
                     size: 20,
                   ),
@@ -113,7 +113,7 @@ class ModernSummaryWidget extends StatelessWidget {
                       children: [
                         Text(
                           'Net Today',
-                          style: theme.textTheme.bodyMedium?.copyWith(
+                          style: theme.textTheme.bodyLarge?.copyWith(
                             color: Colors.white.withOpacity(0.8),
                             fontWeight: FontWeight.w500,
                           ),
@@ -147,7 +147,7 @@ class ModernSummaryWidget extends StatelessWidget {
                               netChange > 0
                                   ? FontAwesomeIcons.arrowUp
                                   : FontAwesomeIcons.arrowDown,
-                              size: 12,
+                              size: 16,
                               color: Colors.white,
                             ),
                             const SizedBox(width: 4),

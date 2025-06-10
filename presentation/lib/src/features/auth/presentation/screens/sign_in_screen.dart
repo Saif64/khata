@@ -162,7 +162,7 @@ class _SignInScreenState extends State<SignInScreen>
                                     decoration: InputDecoration(
                                       labelText: 'Phone',
                                       prefixIcon: Icon(
-                                        Icons.email_outlined,
+                                        FontAwesomeIcons.squarePhone,
                                         color: colorScheme.primary,
                                       ),
                                       fillColor: colorScheme.inputFill,
@@ -181,14 +181,14 @@ class _SignInScreenState extends State<SignInScreen>
                                     decoration: InputDecoration(
                                       labelText: 'Password',
                                       prefixIcon: Icon(
-                                        Icons.lock_outline,
+                                        FontAwesomeIcons.fingerprint,
                                         color: colorScheme.primary,
                                       ),
                                       suffixIcon: IconButton(
                                         icon: Icon(
                                           _obscurePassword
-                                              ? Icons.visibility_off_outlined
-                                              : Icons.visibility_outlined,
+                                              ? FontAwesomeIcons.eyeSlash
+                                              : FontAwesomeIcons.eye,
                                           color: colorScheme.primary,
                                         ),
                                         onPressed: () {

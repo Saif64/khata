@@ -71,14 +71,14 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
           children: [
             Text(
               'Dashboard',
-              style: theme.textTheme.headlineSmall?.copyWith(
+              style: theme.textTheme.headlineMedium?.copyWith(
                 fontWeight: FontWeight.bold,
                 color: colorScheme.onSurface,
               ),
             ),
             Text(
               'Track your finances',
-              style: theme.textTheme.bodySmall?.copyWith(
+              style: theme.textTheme.bodyMedium?.copyWith(
                 color: colorScheme.onSurface.withOpacity(0.6),
               ),
             ),
@@ -259,7 +259,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
             _isYesterday(t.date, yesterday, today))
         .fold(0.0, (sum, t) => sum + t.amount);
 
-    return ModernSummaryWidget(
+    return SummaryWidget(
       todaysSales: todaysSales,
       todaysSpending: todaysExpenses,
       yesterdaysSales: yesterdaysSales,
