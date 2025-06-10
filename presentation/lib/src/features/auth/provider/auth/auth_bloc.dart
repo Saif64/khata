@@ -7,7 +7,7 @@ import '../auth.dart';
 
 class AuthBloc extends Bloc<AuthEvent, AuthState> {
   final AuthRepository _authRepository;
-  late StreamSubscription<UserEntity?> _userSubscription;
+  StreamSubscription<UserEntity?>? _userSubscription;
 
   AuthBloc(this._authRepository) : super(const AuthInitial()) {
     _userSubscription = _authRepository.authStateChanges.listen(
@@ -95,7 +95,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
 
   @override
   Future<void> close() {
-    _userSubscription.cancel();
+    _userSubscription?.cancel();
     return super.close();
   }
 }
