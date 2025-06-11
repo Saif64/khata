@@ -80,12 +80,11 @@ class AuthRepositoryImpl implements AuthRepository {
     final failureOrUser = await remoteDataSource.getCurrentUser();
     return failureOrUser.fold(
       (failure) async {
-        if (failure is NetworkFailure) {
-          final cachedUser = await localDataSource.getCachedUser();
-          if (cachedUser != null) {
-            return Right(cachedUser);
-          }
+        final cachedUser = await localDataSource.getCachedUser();
+        if (cachedUser != null) {
+          return Right(cachedUser);
         }
+
         return Left(failure);
       },
       (user) {
