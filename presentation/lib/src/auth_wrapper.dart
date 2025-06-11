@@ -4,7 +4,7 @@ import 'package:presentation/core/widgets/loader.dart';
 
 import 'features/auth/presentation/screens/sign_in_screen.dart';
 import 'features/auth/provider/auth.dart';
-import 'features/home/presentation/screens/home_screen.dart';
+import 'main_screen.dart';
 
 class AuthWrapper extends StatelessWidget {
   const AuthWrapper({super.key});
@@ -14,7 +14,7 @@ class AuthWrapper extends StatelessWidget {
     return BlocBuilder<AuthBloc, AuthState>(
       builder: (context, state) {
         if (state is Authenticated) {
-          return const HomeScreen();
+          return MainLandingScreen();
         }
         if (state is Unauthenticated || state is AuthFailureState) {
           return const SignInScreen();

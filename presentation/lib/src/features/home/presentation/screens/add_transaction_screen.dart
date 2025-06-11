@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:presentation/core/widgets/back_button.dart';
 import 'package:presentation/src/features/home/presentation/bloc/home_bloc.dart';
 import 'package:presentation/src/features/home/presentation/bloc/home_event.dart';
 import 'package:presentation/src/features/home/presentation/widgets/transaction_type_card.dart';
@@ -127,11 +128,7 @@ class _AddTransactionScreenState extends State<AddTransactionScreen>
       appBar: AppBar(
         elevation: 0,
         backgroundColor: Colors.transparent,
-        leading: IconButton(
-          icon:
-              Icon(Icons.arrow_back_ios_rounded, color: colorScheme.onSurface),
-          onPressed: () => Navigator.pop(context),
-        ),
+        leading: ThemedIconButton.back(),
         title: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [

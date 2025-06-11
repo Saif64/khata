@@ -1,9 +1,13 @@
+import 'package:domain/domain.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:presentation/core/routes.dart';
 import 'package:presentation/core/widgets/loader.dart';
 import 'package:presentation/src/features/auth/provider/auth.dart';
 import 'package:presentation/src/features/home/presentation/bloc/home_bloc.dart';
 import 'package:presentation/src/features/home/presentation/bloc/home_state.dart';
+import 'package:presentation/src/features/home/presentation/widgets/home_action_buttons.dart';
 import 'package:presentation/src/features/home/presentation/widgets/home_error_view.dart';
 import 'package:presentation/src/features/home/presentation/widgets/home_transaction_header.dart';
 import 'package:presentation/src/features/home/presentation/widgets/home_welcome_header.dart';
@@ -11,7 +15,6 @@ import 'package:presentation/src/features/home/presentation/widgets/summary_card
 import 'package:presentation/src/features/home/presentation/widgets/transaction_list_widget.dart';
 
 import '../bloc/home_event.dart';
-import '../widgets/home_floating_action_buttons.dart';
 import '../widgets/sync_status_icon.dart';
 import '../widgets/weekly_net_worth_chart.dart';
 
@@ -24,8 +27,10 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   late AnimationController _animationController;
+  late AnimationController _quickActionsController;
   late Animation<double> _fadeAnimation;
   late Animation<Offset> _slideAnimation;
+  late Animation<double> _quickActionsAnimation;
 
   String _selectedFilter = 'This month';
   final List<String> _dateFilters = [
@@ -43,6 +48,11 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       duration: const Duration(milliseconds: 800),
       vsync: this,
     );
+    _quickActionsController = AnimationController(
+      duration: const Duration(milliseconds: 600),
+      vsync: this,
+    );
+
     _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
       CurvedAnimation(parent: _animationController, curve: Curves.easeOut),
     );
@@ -54,13 +64,26 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       curve: Curves.easeOutCubic,
     ));
 
+    _quickActionsAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(
+        parent: _quickActionsController,
+        curve: Curves.elasticOut,
+      ),
+    );
+
     context.read<HomeBloc>().add(LoadHomeData());
     _animationController.forward();
+
+    // Delay quick actions animation
+    Future.delayed(const Duration(milliseconds: 400), () {
+      _quickActionsController.forward();
+    });
   }
 
   @override
   void dispose() {
     _animationController.dispose();
+    _quickActionsController.dispose();
     _searchController.dispose();
     super.dispose();
   }
@@ -129,9 +152,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
           },
         ),
       ),
-      floatingActionButton:
-          HomeFloatingActionButtons(context: context, colorScheme: colorScheme),
-      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
+      // Remove floating action buttons to avoid conflict with bottom nav
     );
   }
 
@@ -152,13 +173,21 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                   padding: const EdgeInsets.all(20),
                   child: Column(
                     children: [
+                      // Quick Actions Section
+                      HomeActionButtonCard(
+                          quickActionsAnimation: _quickActionsAnimation,
+                          context: context,
+                          colorScheme: colorScheme,
+                          theme: theme),
+                      const SizedBox(height: 24),
+
                       SummaryCard(transactions: state.transactions),
                       const SizedBox(height: 32),
                       HomeTransactionHeader(context: context, theme: theme),
                       const SizedBox(height: 16),
                       WeeklyNetWorthChart(transactions: state.transactions),
                       const SizedBox(height: 16),
-                      _buildDateFilterDropdown(theme, colorScheme),
+                      _buildDateFilterChips(theme, colorScheme),
                       const SizedBox(height: 16),
                     ],
                   ),
@@ -173,39 +202,134 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
             selectedFilter: _selectedFilter,
           ),
           const SliverToBoxAdapter(
-            child: SizedBox(height: 100),
+            child: SizedBox(height: 120), // Extra space for floating bottom nav
           ),
         ],
       ),
     );
   }
 
-  Widget _buildDateFilterDropdown(ThemeData theme, ColorScheme colorScheme) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-      decoration: BoxDecoration(
-        color: colorScheme.surface,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: colorScheme.outline.withOpacity(0.2)),
+  Widget _buildDateFilterChips(ThemeData theme, ColorScheme colorScheme) {
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      child: Row(
+        children: _dateFilters.map((filter) {
+          final isSelected = _selectedFilter == filter;
+          return Padding(
+            padding: const EdgeInsets.only(right: 6),
+            child: FilterChip(
+              selected: isSelected,
+              label: Text(filter),
+              onSelected: (_) {
+                setState(() => _selectedFilter = filter);
+                context.read<HomeBloc>().add(FilterTransactions(filter));
+              },
+              backgroundColor: colorScheme.secondary,
+              selectedColor: colorScheme.primary,
+              checkmarkColor: theme.canvasColor,
+            ),
+          );
+        }).toList(),
       ),
-      child: DropdownButtonHideUnderline(
-        child: DropdownButton<String>(
-          value: _selectedFilter,
-          isExpanded: true,
-          items: _dateFilters.map<DropdownMenuItem<String>>((String value) {
-            return DropdownMenuItem<String>(
-              value: value,
-              child: Text(value),
-            );
-          }).toList(),
-          onChanged: (String? newValue) {
-            if (newValue != null) {
-              setState(() {
-                _selectedFilter = newValue;
-              });
-              context.read<HomeBloc>().add(FilterTransactions(newValue));
-            }
-          },
+    );
+  }
+}
+
+class HomeActionButtonCard extends StatelessWidget {
+  const HomeActionButtonCard({
+    super.key,
+    required Animation<double> quickActionsAnimation,
+    required this.context,
+    required this.colorScheme,
+    required this.theme,
+  }) : _quickActionsAnimation = quickActionsAnimation;
+
+  final Animation<double> _quickActionsAnimation;
+  final BuildContext context;
+  final ColorScheme colorScheme;
+  final ThemeData theme;
+
+  @override
+  Widget build(BuildContext context) {
+    return ScaleTransition(
+      scale: _quickActionsAnimation,
+      child: Container(
+        padding: const EdgeInsets.all(20),
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [
+              colorScheme.primaryContainer.withOpacity(0.8),
+              colorScheme.primaryContainer.withOpacity(0.4),
+            ],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+          borderRadius: BorderRadius.circular(20),
+          boxShadow: [
+            BoxShadow(
+              color: colorScheme.primary.withOpacity(0.1),
+              blurRadius: 20,
+              offset: const Offset(0, 8),
+            ),
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Icon(
+                  Icons.bolt_rounded,
+                  color: colorScheme.primary,
+                  size: 24,
+                ),
+                const SizedBox(width: 8),
+                Text(
+                  'Quick Actions',
+                  style: theme.textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.bold,
+                    color: colorScheme.onPrimaryContainer,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 16),
+            Row(
+              children: [
+                Expanded(
+                  child: HomeActionButton(
+                    icon: FontAwesomeIcons.arrowTrendUp,
+                    label: 'Add Sale',
+                    color: colorScheme.primary,
+                    backgroundColor: colorScheme.primary.withOpacity(0.1),
+                    onTap: () {
+                      Navigator.pushNamed(
+                        context,
+                        Routes.ADD_TRANSACTION,
+                        arguments: TransactionType.sale,
+                      );
+                    },
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: HomeActionButton(
+                    icon: FontAwesomeIcons.arrowTrendDown,
+                    label: 'Add Expense',
+                    color: colorScheme.error,
+                    backgroundColor: colorScheme.error.withOpacity(0.1),
+                    onTap: () {
+                      Navigator.pushNamed(
+                        context,
+                        Routes.ADD_TRANSACTION,
+                        arguments: TransactionType.expense,
+                      );
+                    },
+                  ),
+                ),
+              ],
+            ),
+          ],
         ),
       ),
     );
