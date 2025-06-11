@@ -1,6 +1,6 @@
 name: presentation
 description: The presentation layer for the expense tracker app.
-version: 1.0.0+1
+version: 0.0.1+1
 publish_to: 'none'
 
 environment:
@@ -17,14 +17,14 @@ dependencies:
     path: ../data
 
   hive_flutter: ^1.1.0
-  supabase_flutter: ^2.9.0
+  supabase_flutter: ^2.9.1
   path_provider: ^2.1.5
   flutter_dotenv: ^5.2.1
   lottie: ^3.3.1
   flutter_bloc: ^9.1.1
   equatable: ^2.0.7
-  shared_preferences: ^2.2.3
-  supabase: ^2.7.0
+  shared_preferences: ^2.5.3
+  supabase: ^2.8.0
   get_it: ^8.0.3
   uuid: ^4.5.1
 
