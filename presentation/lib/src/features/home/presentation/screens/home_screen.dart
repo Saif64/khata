@@ -10,6 +10,8 @@ import 'package:presentation/src/features/home/presentation/widgets/sync_status_
 
 import '../bloc/home_event.dart';
 import '../widgets/summary_table.dart';
+import '../widgets/weekly_net_worth_chart.dart';
+import 'all_transactions_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -23,7 +25,13 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   late Animation<double> _fadeAnimation;
   late Animation<Offset> _slideAnimation;
 
-  String _selectedFilter = 'All';
+  String _selectedFilter = 'This month';
+  final List<String> _dateFilters = [
+    'This week',
+    'Last week',
+    'This month',
+    'Last month'
+  ];
   final TextEditingController _searchController = TextEditingController();
 
   @override
@@ -213,7 +221,9 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                       const SizedBox(height: 32),
                       _buildTransactionsHeader(theme),
                       const SizedBox(height: 16),
-                      _buildFilterChips(theme, colorScheme),
+                      WeeklyNetWorthChart(transactions: state.transactions),
+                      const SizedBox(height: 16),
+                      _buildDateFilterDropdown(theme, colorScheme),
                       const SizedBox(height: 16),
                     ],
                   ),
@@ -229,6 +239,37 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
             child: SizedBox(height: 100), // Space for FAB
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildDateFilterDropdown(ThemeData theme, ColorScheme colorScheme) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+      decoration: BoxDecoration(
+        color: colorScheme.surface,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: colorScheme.outline.withOpacity(0.2)),
+      ),
+      child: DropdownButtonHideUnderline(
+        child: DropdownButton<String>(
+          value: _selectedFilter,
+          isExpanded: true,
+          items: _dateFilters.map<DropdownMenuItem<String>>((String value) {
+            return DropdownMenuItem<String>(
+              value: value,
+              child: Text(value),
+            );
+          }).toList(),
+          onChanged: (String? newValue) {
+            if (newValue != null) {
+              setState(() {
+                _selectedFilter = newValue;
+              });
+              context.read<HomeBloc>().add(FilterTransactions(newValue));
+            }
+          },
+        ),
       ),
     );
   }
@@ -279,7 +320,15 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
         ),
         TextButton.icon(
           onPressed: () {
-            // Navigate to full transactions list
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (_) => AllTransactionsScreen(
+                  transactions: (context.read<HomeBloc>().state as HomeLoaded)
+                      .transactions,
+                ),
+              ),
+            );
           },
           icon: const Icon(Icons.arrow_forward_rounded, size: 16),
           label: const Text('View All'),

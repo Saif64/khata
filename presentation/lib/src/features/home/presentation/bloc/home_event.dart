@@ -15,3 +15,10 @@ class AddTransaction extends HomeEvent {
   @override
   List<Object> get props => [transaction];
 }
+
+class FilterTransactions extends HomeEvent {
+  final String filter;
+  const FilterTransactions(this.filter);
+  @override
+  List<Object> get props => [filter];
+}
