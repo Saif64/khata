@@ -5,6 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:presentation/src/features/home/presentation/bloc/home_bloc.dart';
 import 'package:presentation/src/features/home/presentation/bloc/home_event.dart';
+import 'package:presentation/src/features/home/presentation/widgets/transaction_type_card.dart';
 import 'package:uuid/uuid.dart';
 
 class AddTransactionScreen extends StatefulWidget {
@@ -73,7 +74,6 @@ class _AddTransactionScreenState extends State<AddTransactionScreen>
         _isLoading = true;
       });
 
-      // Add haptic feedback
       HapticFeedback.lightImpact();
 
       final transaction = TransactionEntity(
@@ -86,7 +86,6 @@ class _AddTransactionScreenState extends State<AddTransactionScreen>
 
       context.read<HomeBloc>().add(AddTransaction(transaction));
 
-      // Simulate processing time for better UX
       await Future.delayed(const Duration(milliseconds: 500));
 
       if (mounted) {
@@ -95,7 +94,6 @@ class _AddTransactionScreenState extends State<AddTransactionScreen>
         });
         Navigator.pop(context);
 
-        // Show success feedback
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
@@ -167,25 +165,19 @@ class _AddTransactionScreenState extends State<AddTransactionScreen>
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
-                        // Transaction Type Indicator
-                        _buildTransactionTypeCard(
-                            theme, colorScheme, primaryColor, isSale),
+                        TransactionTypeCard(
+                            theme: theme,
+                            colorScheme: colorScheme,
+                            primaryColor: primaryColor,
+                            isSale: isSale),
                         const SizedBox(height: 32),
-
-                        // Amount Input
                         _buildAmountInput(theme, colorScheme, primaryColor),
                         const SizedBox(height: 24),
-
-                        // Description Input
                         _buildDescriptionInput(theme, colorScheme),
                         const SizedBox(height: 20),
-
-                        // Quick Description Chips
                         _buildQuickDescriptions(
                             theme, colorScheme, primaryColor),
                         const SizedBox(height: 32),
-
-                        // Submit Button
                         _buildSubmitButton(theme, primaryColor, isSale),
                       ],
                     ),
@@ -195,71 +187,6 @@ class _AddTransactionScreenState extends State<AddTransactionScreen>
             ),
           ),
         ),
-      ),
-    );
-  }
-
-  Widget _buildTransactionTypeCard(ThemeData theme, ColorScheme colorScheme,
-      Color primaryColor, bool isSale) {
-    return Container(
-      padding: const EdgeInsets.all(24),
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [
-            primaryColor,
-            primaryColor.withOpacity(0.8),
-          ],
-        ),
-        borderRadius: BorderRadius.circular(24),
-        boxShadow: [
-          BoxShadow(
-            color: primaryColor.withOpacity(0.3),
-            blurRadius: 20,
-            offset: const Offset(0, 8),
-          ),
-        ],
-      ),
-      child: Row(
-        children: [
-          Container(
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.2),
-              borderRadius: BorderRadius.circular(16),
-            ),
-            child: FaIcon(
-              isSale
-                  ? FontAwesomeIcons.arrowTrendUp
-                  : FontAwesomeIcons.arrowTrendDown,
-              color: Colors.white,
-              size: 32,
-            ),
-          ),
-          const SizedBox(width: 20),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  isSale ? 'New Sale' : 'New Expense',
-                  style: theme.textTheme.headlineSmall?.copyWith(
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  isSale ? 'Record money coming in' : 'Record money going out',
-                  style: theme.textTheme.bodyMedium?.copyWith(
-                    color: Colors.white.withOpacity(0.8),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
       ),
     );
   }

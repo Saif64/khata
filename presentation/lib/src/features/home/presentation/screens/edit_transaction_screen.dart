@@ -76,7 +76,7 @@ class _EditTransactionScreenState extends State<EditTransactionScreen>
         amount: double.parse(_amountController.text),
         description: _descriptionController.text,
         type: _transactionType,
-        date: widget.transaction.date, // Keep the original date
+        date: widget.transaction.date,
       );
 
       context.read<HomeBloc>().add(EditTransaction(updatedTransaction));
@@ -157,7 +157,7 @@ class _EditTransactionScreenState extends State<EditTransactionScreen>
         ),
         actions: [
           IconButton(
-            icon: Icon(Icons.delete_outline_rounded, color: colorScheme.error),
+            icon: Icon(FontAwesomeIcons.trashCan, color: colorScheme.error),
             onPressed: _delete,
           )
         ],

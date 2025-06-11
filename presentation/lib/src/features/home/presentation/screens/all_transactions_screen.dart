@@ -1,5 +1,3 @@
-// presentation/lib/src/features/home/presentation/screens/all_transactions_screen.dart
-
 import 'package:domain/domain.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -7,13 +5,13 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:presentation/core/theme/app_theme.dart';
 import 'package:presentation/src/features/home/presentation/bloc/home_bloc.dart';
 import 'package:presentation/src/features/home/presentation/bloc/home_state.dart';
+import 'package:presentation/src/features/home/presentation/widgets/no_transaction_view.dart';
 import 'package:presentation/src/features/home/presentation/widgets/transaction_list_item.dart';
 
 import '../../../../../core/widgets/back_button.dart';
 import '../../../../../core/widgets/loader.dart';
 
 class AllTransactionsScreen extends StatefulWidget {
-  // The static list is removed from the constructor
   const AllTransactionsScreen({super.key});
 
   @override
@@ -36,7 +34,6 @@ class _AllTransactionsScreenState extends State<AllTransactionsScreen> {
 
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
-      // The body is now wrapped in a BlocBuilder
       body: BlocBuilder<HomeBloc, HomeState>(
         builder: (context, state) {
           if (state is HomeLoading) {
@@ -46,7 +43,6 @@ class _AllTransactionsScreenState extends State<AllTransactionsScreen> {
             return Center(child: Text(state.message));
           }
           if (state is HomeLoaded) {
-            // Filter the transactions from the current state
             final filteredTransactions =
                 _getFilteredTransactions(state.transactions);
 
@@ -80,7 +76,7 @@ class _AllTransactionsScreenState extends State<AllTransactionsScreen> {
         startDate = DateTime(now.year, now.month, now.day - (weekDay - 1));
         endDate = DateTime(now.year, now.month, now.day, 23, 59, 59);
         break;
-      // ... other cases remain the same
+
       case 'Last week':
         final weekDay = now.weekday;
         startDate = DateTime(now.year, now.month, now.day - (weekDay - 1) - 7);
@@ -110,11 +106,7 @@ class _AllTransactionsScreenState extends State<AllTransactionsScreen> {
     }).toList();
   }
 
-  // Helper methods like _buildSliverAppBar, _buildFilterSection, etc. remain the same,
-  // but _buildFilterSection now takes the count of filtered transactions.
-
   Widget _buildSliverAppBar(ThemeData theme, ColorScheme colorScheme) {
-    // ... no changes here
     return SliverAppBar(
       expandedHeight: 120,
       floating: false,
@@ -139,7 +131,6 @@ class _AllTransactionsScreenState extends State<AllTransactionsScreen> {
 
   Widget _buildFilterSection(
       ThemeData theme, ColorScheme colorScheme, int count) {
-    // ... updated to use the count parameter
     return Container(
       margin: const EdgeInsets.all(20),
       padding: const EdgeInsets.all(20),
@@ -189,7 +180,6 @@ class _AllTransactionsScreenState extends State<AllTransactionsScreen> {
   }
 
   Widget _buildDateFilterDropdown(ThemeData theme, ColorScheme colorScheme) {
-    // ... no changes here
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
       decoration: BoxDecoration(
@@ -236,7 +226,7 @@ class _AllTransactionsScreenState extends State<AllTransactionsScreen> {
       List<TransactionEntity> transactions) {
     if (transactions.isEmpty) {
       return SliverFillRemaining(
-        child: _buildEmptyState(theme, colorScheme),
+        child: NoTransactionView(theme: theme, colorScheme: colorScheme),
       );
     }
 
@@ -266,44 +256,6 @@ class _AllTransactionsScreenState extends State<AllTransactionsScreen> {
           },
           childCount: transactions.length,
         ),
-      ),
-    );
-  }
-
-  Widget _buildEmptyState(ThemeData theme, ColorScheme colorScheme) {
-    // ... no changes here
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Container(
-            padding: const EdgeInsets.all(24),
-            decoration: BoxDecoration(
-              color: colorScheme.surfaceVariant,
-              shape: BoxShape.circle,
-            ),
-            child: Icon(
-              FontAwesomeIcons.receipt,
-              color: colorScheme.onSurfaceVariant,
-              size: 32,
-            ),
-          ),
-          const SizedBox(height: 24),
-          Text(
-            'No transactions found',
-            style: theme.textTheme.titleMedium?.copyWith(
-              fontWeight: FontWeight.w600,
-              color: colorScheme.onSurface,
-            ),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            'Try selecting a different time period',
-            style: theme.textTheme.bodyMedium?.copyWith(
-              color: colorScheme.onSurfaceVariant,
-            ),
-          ),
-        ],
       ),
     );
   }

@@ -1,20 +1,19 @@
-import 'package:domain/domain.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:presentation/core/utils/time_utils.dart';
 import 'package:presentation/core/widgets/loader.dart';
 import 'package:presentation/src/features/auth/provider/auth.dart';
 import 'package:presentation/src/features/home/presentation/bloc/home_bloc.dart';
 import 'package:presentation/src/features/home/presentation/bloc/home_state.dart';
+import 'package:presentation/src/features/home/presentation/widgets/home_error_view.dart';
+import 'package:presentation/src/features/home/presentation/widgets/home_transaction_header.dart';
+import 'package:presentation/src/features/home/presentation/widgets/home_welcome_header.dart';
+import 'package:presentation/src/features/home/presentation/widgets/summary_card.dart';
 import 'package:presentation/src/features/home/presentation/widgets/transaction_list_widget.dart';
 
 import '../bloc/home_event.dart';
 import '../widgets/home_floating_action_buttons.dart';
-import '../widgets/summary_table.dart';
 import '../widgets/sync_status_icon.dart';
 import '../widgets/weekly_net_worth_chart.dart';
-import 'all_transactions_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -124,70 +123,15 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
               return _buildLoadedState(state, theme, colorScheme);
             }
             if (state is HomeError) {
-              return _buildErrorState(state.message, theme);
+              return HomeErrorView(message: state.message, theme: theme);
             }
-            return _buildWelcomeState(theme);
+            return HomeWelcomeHeader(theme: theme);
           },
         ),
       ),
       floatingActionButton:
           HomeFloatingActionButtons(context: context, colorScheme: colorScheme),
       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
-    );
-  }
-
-  Widget _buildErrorState(String message, ThemeData theme) {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(
-            Icons.error_outline_rounded,
-            size: 64,
-            color: theme.colorScheme.error,
-          ),
-          const SizedBox(height: 16),
-          Text(
-            'Oops! Something went wrong',
-            style: theme.textTheme.headlineSmall,
-          ),
-          const SizedBox(height: 8),
-          Text(
-            message,
-            style: theme.textTheme.bodyMedium?.copyWith(
-              color: theme.colorScheme.onSurface.withOpacity(0.6),
-            ),
-            textAlign: TextAlign.center,
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildWelcomeState(ThemeData theme) {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(
-            FontAwesomeIcons.chartLine,
-            size: 64,
-            color: theme.colorScheme.primary,
-          ),
-          const SizedBox(height: 16),
-          Text(
-            'Welcome to your Dashboard!',
-            style: theme.textTheme.headlineSmall,
-          ),
-          const SizedBox(height: 8),
-          Text(
-            'Start tracking your finances',
-            style: theme.textTheme.bodyMedium?.copyWith(
-              color: theme.colorScheme.onSurface.withOpacity(0.6),
-            ),
-          ),
-        ],
-      ),
     );
   }
 
@@ -208,9 +152,9 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                   padding: const EdgeInsets.all(20),
                   child: Column(
                     children: [
-                      _buildModernSummary(state.transactions),
+                      SummaryCard(transactions: state.transactions),
                       const SizedBox(height: 32),
-                      _buildTransactionsHeader(theme),
+                      HomeTransactionHeader(context: context, theme: theme),
                       const SizedBox(height: 16),
                       WeeklyNetWorthChart(transactions: state.transactions),
                       const SizedBox(height: 16),
@@ -264,102 +208,6 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
           },
         ),
       ),
-    );
-  }
-
-  Widget _buildModernSummary(List<TransactionEntity> transactions) {
-    final now = DateTime.now();
-    final today = DateTime(now.year, now.month, now.day);
-    final yesterday = today.subtract(const Duration(days: 1));
-
-    final todaysSales = transactions
-        .where((t) =>
-            t.type == TransactionType.sale && TimeUtils.isToday(t.date, today))
-        .fold(0.0, (sum, t) => sum + t.amount);
-
-    final todaysExpenses = transactions
-        .where((t) =>
-            t.type == TransactionType.expense &&
-            TimeUtils.isToday(t.date, today))
-        .fold(0.0, (sum, t) => sum + t.amount);
-
-    final yesterdaysSales = transactions
-        .where((t) =>
-            t.type == TransactionType.sale &&
-            TimeUtils.isYesterday(t.date, yesterday, today))
-        .fold(0.0, (sum, t) => sum + t.amount);
-
-    final yesterdaysExpenses = transactions
-        .where((t) =>
-            t.type == TransactionType.expense &&
-            TimeUtils.isYesterday(t.date, yesterday, today))
-        .fold(0.0, (sum, t) => sum + t.amount);
-
-    return SummaryWidget(
-      todaysSales: todaysSales,
-      todaysSpending: todaysExpenses,
-      yesterdaysSales: yesterdaysSales,
-      yesterdaysSpending: yesterdaysExpenses,
-    );
-  }
-
-  Widget _buildTransactionsHeader(ThemeData theme) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Text(
-          'Recent Transactions',
-          style: theme.textTheme.titleLarge?.copyWith(
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        TextButton.icon(
-          onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (_) => AllTransactionsScreen(),
-              ),
-            );
-          },
-          icon: const Icon(Icons.arrow_forward_rounded, size: 16),
-          label: const Text('View All'),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildFilterChips(ThemeData theme, ColorScheme colorScheme) {
-    final filters = ['All', 'Sales', 'Expenses'];
-
-    return Row(
-      children: filters.map((filter) {
-        final isSelected = _selectedFilter == filter;
-        return Padding(
-          padding: const EdgeInsets.only(right: 8),
-          child: FilterChip(
-            selected: isSelected,
-            label: Text(filter),
-            onSelected: (selected) {
-              setState(() {
-                _selectedFilter = filter;
-              });
-            },
-            backgroundColor: colorScheme.surface,
-            selectedColor: colorScheme.primary.withOpacity(0.2),
-            checkmarkColor: colorScheme.primary,
-            labelStyle: TextStyle(
-              color: isSelected ? colorScheme.primary : colorScheme.onSurface,
-              fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
-            ),
-            side: BorderSide(
-              color: isSelected
-                  ? colorScheme.primary
-                  : colorScheme.outline.withOpacity(0.2),
-            ),
-          ),
-        );
-      }).toList(),
     );
   }
 }

@@ -116,7 +116,6 @@ class _SignInScreenState extends State<SignInScreen>
                             crossAxisAlignment: CrossAxisAlignment.stretch,
                             children: [
                               const SizedBox(height: 40),
-                              // Welcome Text
                               Text(
                                 'Welcome to your Khata',
                                 style: theme.textTheme.headlineLarge?.copyWith(
@@ -126,7 +125,6 @@ class _SignInScreenState extends State<SignInScreen>
                                 ),
                                 textAlign: TextAlign.center,
                               ),
-
                               Lottie.asset(
                                 'assets/animations/login_book.json',
                                 frameRate: FrameRate.composition,
@@ -134,8 +132,6 @@ class _SignInScreenState extends State<SignInScreen>
                                 renderCache: RenderCache.raster,
                               ),
                               const SizedBox(height: 8),
-
-                              // Form Card
                               Container(
                                 padding: const EdgeInsets.all(24),
                                 decoration: BoxDecoration(
@@ -205,8 +201,6 @@ class _SignInScreenState extends State<SignInScreen>
                                         },
                                       ),
                                       const SizedBox(height: 32),
-
-                                      // Sign In Button
                                       SizedBox(
                                         width: double.infinity,
                                         child: ElevatedButton(
@@ -223,10 +217,7 @@ class _SignInScreenState extends State<SignInScreen>
                                   ),
                                 ),
                               ),
-
                               const SizedBox(height: 32),
-
-                              // Divider
                               Row(
                                 children: [
                                   Expanded(
@@ -260,10 +251,7 @@ class _SignInScreenState extends State<SignInScreen>
                                   ),
                                 ],
                               ),
-
                               const SizedBox(height: 32),
-
-                              // Social Login Buttons
                               SocialButton(
                                 onPressed: () => _signInWithGoogle(context),
                                 icon: FontAwesomeIcons.google,
@@ -283,8 +271,6 @@ class _SignInScreenState extends State<SignInScreen>
                           ),
                         ),
                       ),
-
-                      // Sign Up Link
                       TextButton(
                         onPressed: () {
                           Navigator.pushNamed(context, '/signUp');

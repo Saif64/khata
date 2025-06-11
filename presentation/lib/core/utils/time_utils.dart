@@ -40,4 +40,14 @@ class TimeUtils {
       return '${date.day} ${months[date.month - 1]}';
     }
   }
+
+  static String formatTime(DateTime date) {
+    final hour = date.hour;
+    final minute = date.minute;
+    final period = hour >= 12 ? 'PM' : 'AM';
+    final displayHour = hour == 0 ? 12 : (hour > 12 ? hour - 12 : hour);
+    final displayMinute = minute.toString().padLeft(2, '0');
+
+    return '$displayHour:$displayMinute $period';
+  }
 }

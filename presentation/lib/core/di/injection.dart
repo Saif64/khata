@@ -10,14 +10,12 @@ import '../../src/features/auth/provider/auth.dart';
 final di = GetIt.instance;
 
 void setupLocator() {
-  // Supabase & Hive
   di.registerLazySingleton<SupabaseClient>(() => Supabase.instance.client);
   di.registerLazySingleton<Box<String>>(() => Hive.box<String>('userBox'));
-  // Assumes you will open a box for transactions
+
   di.registerLazySingleton<Box<TransactionEntity>>(
       () => Hive.box<TransactionEntity>('transactionBox'));
 
-  // AUTH
   di.registerLazySingleton<AuthRemoteDataSource>(
     () => AuthRemoteDataSourceImpl(di<SupabaseClient>()),
   );
@@ -32,7 +30,6 @@ void setupLocator() {
     () => AuthBloc(di<AuthRepository>()),
   );
 
-  // HOME
   di.registerLazySingleton<HomeRemoteDataSource>(
     () => HomeRemoteDataSourceImpl(di<SupabaseClient>()),
   );
