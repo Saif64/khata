@@ -1,16 +1,15 @@
 import 'package:domain/domain.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:presentation/core/routes.dart';
 
 class TransactionListItem extends StatefulWidget {
   final TransactionEntity transaction;
-  final VoidCallback? onTap;
   final VoidCallback? onLongPress;
 
   const TransactionListItem({
     super.key,
     required this.transaction,
-    this.onTap,
     this.onLongPress,
   });
 
@@ -51,6 +50,8 @@ class _TransactionListItemState extends State<TransactionListItem>
 
   void _onTapUp(TapUpDetails details) {
     _animationController.reverse();
+    Navigator.pushNamed(context, Routes.EDIT_TRANSACTION,
+        arguments: widget.transaction);
   }
 
   void _onTapCancel() {
@@ -73,7 +74,6 @@ class _TransactionListItemState extends State<TransactionListItem>
         onTapDown: _onTapDown,
         onTapUp: _onTapUp,
         onTapCancel: _onTapCancel,
-        onTap: widget.onTap,
         onLongPress: widget.onLongPress,
         child: Container(
           margin: const EdgeInsets.only(bottom: 12),

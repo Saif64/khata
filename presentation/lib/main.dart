@@ -8,6 +8,7 @@ import 'package:presentation/src/features/auth/provider/auth.dart';
 import 'package:presentation/src/features/home/adapters/transaction_adapter.dart';
 import 'package:presentation/src/features/home/presentation/bloc/home_bloc.dart';
 import 'package:presentation/src/features/home/presentation/screens/add_transaction_screen.dart';
+import 'package:presentation/src/features/home/presentation/screens/edit_transaction_screen.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'core/di/injection.dart';
@@ -77,6 +78,13 @@ class MyApp extends StatelessWidget {
               final type = settings.arguments as TransactionType;
               return MaterialPageRoute(
                 builder: (context) => AddTransactionScreen(type: type),
+              );
+            }
+            if (settings.name == Routes.EDIT_TRANSACTION) {
+              final transaction = settings.arguments as TransactionEntity;
+              return MaterialPageRoute(
+                builder: (context) =>
+                    EditTransactionScreen(transaction: transaction),
               );
             }
             return null;

@@ -222,13 +222,11 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
               ),
             ),
           ),
-          SliverToBoxAdapter(
-            child: TransactionListWidget(
-              transactions: state.transactions,
-              theme: theme,
-              colorScheme: colorScheme,
-              selectedFilter: _selectedFilter,
-            ),
+          TransactionListWidget(
+            transactions: state.transactions,
+            theme: theme,
+            colorScheme: colorScheme,
+            selectedFilter: _selectedFilter,
           ),
           const SliverToBoxAdapter(
             child: SizedBox(height: 100),
