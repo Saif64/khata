@@ -11,6 +11,11 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
+
+    permissions:
+      contents: write
+    # -----------------------------------------
+
     steps:
       # Step 1: Check out the code
       - name: Checkout code
@@ -20,8 +25,7 @@ jobs:
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
-          # Make sure this version matches your project's Flutter version
-          flutter-version: '3.32.0' # Or your specific version
+          flutter-version: '3.19.6' # Or your specific version
           channel: 'stable'
 
       # Step 3: Get the app version
@@ -34,7 +38,6 @@ jobs:
 
       # Step 4: Create the .env file from the GitHub secret
       - name: Create .env file
-        # This creates the .env file in the correct directory
         run: echo "${{ secrets.ENV_FILE }}" > presentation/.env
 
       # Step 5: Install dependencies and build the APK
