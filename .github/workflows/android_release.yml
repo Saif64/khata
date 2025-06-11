@@ -1,0 +1,59 @@
+# .github/workflows/android_release.yml
+
+name: Android Release APK
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Step 1: Check out the code
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # Step 2: Set up Flutter
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.10.0'
+          channel: 'stable'
+
+      # Step 3: Get the app version
+      - name: Get pubspec version
+        id: pubspec
+        uses: CumulusDS/get-yaml-paths-action@v1
+        with:
+          file: presentation/pubspec.yaml
+          version: version
+
+      # Step 4: Install dependencies
+      - name: Install dependencies
+        run: |
+          flutter pub get
+          cd data && flutter pub get && cd ..
+          cd domain && flutter pub get && cd ..
+          cd presentation && flutter pub get && cd ..
+
+      # Step 5: Build the release APK
+      - name: Build release APK
+        run: |
+          cd presentation
+          flutter build apk --release --obfuscate --split-debug-info=./debug_info
+
+      # Step 6: Create a GitHub Release
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v1
+        with:
+          # This will create a tag like 'v1.0.0+1' from your pubspec.yaml version
+          tag_name: v${{ steps.pubspec.outputs.version }}
+          # The name of the release will be 'Release v1.0.0+1'
+          name: Release v${{ steps.pubspec.outputs.version }}
+          # This uses the commit messages since the last release to generate release notes
+          generate_release_notes: true
+          # This attaches the generated APK to the release
+          files: presentation/build/app/outputs/flutter-apk/app-release.apk
