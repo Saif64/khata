@@ -10,14 +10,15 @@ import 'package:presentation/src/features/home/presentation/bloc/home_bloc.dart'
 import 'package:presentation/src/features/home/presentation/screens/add_transaction_screen.dart';
 import 'package:presentation/src/features/home/presentation/screens/all_transactions_screen.dart';
 import 'package:presentation/src/features/home/presentation/screens/edit_transaction_screen.dart';
+import 'package:presentation/src/main_screen.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'core/di/injection.dart';
+import 'core/enums/tab_enum.dart';
 import 'core/routes.dart';
 import 'src/auth_wrapper.dart';
 import 'src/features/auth/presentation/screens/sign_in_screen.dart';
 import 'src/features/auth/presentation/screens/sign_up_screen.dart';
-import 'src/features/home/presentation/screens/home_screen.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -72,7 +73,6 @@ class MyApp extends StatelessWidget {
             '/': (context) => const AuthWrapper(),
             Routes.SIGN_IN: (context) => const SignInScreen(),
             Routes.SIGN_UP: (context) => const SignUpScreen(),
-            Routes.HOME: (context) => const HomeScreen(),
             Routes.ALL_TRANSACTION: (context) => const AllTransactionsScreen(),
           },
           onGenerateRoute: (settings) {
@@ -87,6 +87,14 @@ class MyApp extends StatelessWidget {
               return MaterialPageRoute(
                 builder: (context) =>
                     EditTransactionScreen(transaction: transaction),
+              );
+            }
+
+            if (settings.name == Routes.HOME) {
+              final tab = settings.arguments as MainScreen?;
+              return MaterialPageRoute(
+                builder: (context) =>
+                    MainLandingScreen(tab: tab ?? MainScreen.home),
               );
             }
             return null;

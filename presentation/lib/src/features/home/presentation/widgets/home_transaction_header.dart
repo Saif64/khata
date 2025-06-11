@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:presentation/core/enums/tab_enum.dart';
 import 'package:presentation/core/routes.dart';
 
 class HomeTransactionHeader extends StatelessWidget {
@@ -24,7 +25,8 @@ class HomeTransactionHeader extends StatelessWidget {
         ),
         TextButton.icon(
           onPressed: () {
-            Navigator.pushNamed(context, Routes.ALL_TRANSACTION);
+            Navigator.pushNamed(context, Routes.HOME,
+                arguments: MainScreen.transaction);
           },
           icon: const Icon(Icons.arrow_forward_rounded, size: 16),
           label: const Text('View All'),

@@ -8,7 +8,6 @@ import 'package:presentation/src/features/home/presentation/bloc/home_state.dart
 import 'package:presentation/src/features/home/presentation/widgets/no_transaction_view.dart';
 import 'package:presentation/src/features/home/presentation/widgets/transaction_list_item.dart';
 
-import '../../../../../core/widgets/back_button.dart';
 import '../../../../../core/widgets/loader.dart';
 
 class AllTransactionsScreen extends StatefulWidget {
@@ -108,13 +107,13 @@ class _AllTransactionsScreenState extends State<AllTransactionsScreen> {
 
   Widget _buildSliverAppBar(ThemeData theme, ColorScheme colorScheme) {
     return SliverAppBar(
-      expandedHeight: 120,
+      expandedHeight: 80,
       floating: false,
       pinned: true,
       elevation: 0,
+      automaticallyImplyLeading: false,
       backgroundColor: theme.scaffoldBackgroundColor,
       surfaceTintColor: Colors.transparent,
-      leading: const ThemedIconButton.back(),
       flexibleSpace: FlexibleSpaceBar(
         title: Text(
           'All Transactions',
@@ -123,8 +122,7 @@ class _AllTransactionsScreenState extends State<AllTransactionsScreen> {
             color: colorScheme.onSurface,
           ),
         ),
-        centerTitle: false,
-        titlePadding: const EdgeInsets.only(left: 72, bottom: 16),
+        centerTitle: true,
       ),
     );
   }
