@@ -20,7 +20,7 @@ jobs:
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.10.0' # You can specify your desired Flutter version
+          flutter-version: '3.32.0' # You can specify your desired Flutter version
           channel: 'stable'
 
       # Step 3: Get the app version from the presentation's pubspec.yaml
