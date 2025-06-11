@@ -1,0 +1,54 @@
+# .github/workflows/android_release.yml
+
+name: Android Release APK
+
+# This workflow is triggered on every push to the 'master' branch.
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Step 1: Check out the code from the repository
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # Step 2: Set up the Flutter environment
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.32.0' # You can specify your desired Flutter version here
+          channel: 'stable'
+
+      # Step 3: Get the app version from pubspec.yaml
+      - name: Get pubspec version
+        id: pubspec
+        uses: CumulusDS/get-yaml-paths-action@v1
+        with:
+          file: presentation/pubspec.yaml
+          version: version
+
+      # Step 4: Install dependencies for all modules
+      - name: Install dependencies
+        run: |
+          flutter pub get
+          cd data && flutter pub get && cd ..
+          cd domain && flutter pub get && cd ..
+          cd presentation && flutter pub get && cd ..
+
+      # Step 5: Build the release APK
+      - name: Build release APK
+        run: |
+          cd presentation
+          flutter build apk --release --obfuscate --split-debug-info=./debug_info
+
+      # Step 6: Rename and upload the APK
+      - name: Upload APK
+        uses: actions/upload-artifact@v3
+        with:
+          name: khata-release-${{ steps.pubspec.outputs.version }}
+          path: presentation/build/app/outputs/flutter-apk/app-release.apk
