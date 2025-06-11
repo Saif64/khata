@@ -5,43 +5,38 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:presentation/src/features/home/presentation/bloc/home_bloc.dart';
 import 'package:presentation/src/features/home/presentation/bloc/home_event.dart';
-import 'package:presentation/src/features/home/presentation/widgets/transaction_type_card.dart';
-import 'package:uuid/uuid.dart';
 
-class AddTransactionScreen extends StatefulWidget {
-  final TransactionType type;
+class EditTransactionScreen extends StatefulWidget {
+  final TransactionEntity transaction;
 
-  const AddTransactionScreen({super.key, required this.type});
+  const EditTransactionScreen({super.key, required this.transaction});
 
   @override
-  State<AddTransactionScreen> createState() => _AddTransactionScreenState();
+  State<EditTransactionScreen> createState() => _EditTransactionScreenState();
 }
 
-class _AddTransactionScreenState extends State<AddTransactionScreen>
+class _EditTransactionScreenState extends State<EditTransactionScreen>
     with TickerProviderStateMixin {
   final _formKey = GlobalKey<FormState>();
-  final _descriptionController = TextEditingController();
-  final _amountController = TextEditingController();
+  late TextEditingController _descriptionController;
+  late TextEditingController _amountController;
+  late TransactionType _transactionType;
 
   late AnimationController _animationController;
   late Animation<double> _fadeAnimation;
   late Animation<Offset> _slideAnimation;
 
   bool _isLoading = false;
-  final List<String> _quickDescriptions = [
-    'Coffee',
-    'Lunch',
-    'Gas',
-    'Groceries',
-    'Shopping',
-    'Transport',
-    'Entertainment',
-    'Utilities',
-  ];
 
   @override
   void initState() {
     super.initState();
+    _descriptionController =
+        TextEditingController(text: widget.transaction.description);
+    _amountController =
+        TextEditingController(text: widget.transaction.amount.toString());
+    _transactionType = widget.transaction.type;
+
     _animationController = AnimationController(
       duration: const Duration(milliseconds: 600),
       vsync: this,
@@ -76,15 +71,15 @@ class _AddTransactionScreenState extends State<AddTransactionScreen>
 
       HapticFeedback.lightImpact();
 
-      final transaction = TransactionEntity(
-        id: const Uuid().v4(),
+      final updatedTransaction = TransactionEntity(
+        id: widget.transaction.id,
         amount: double.parse(_amountController.text),
         description: _descriptionController.text,
-        type: widget.type,
-        date: DateTime.now(),
+        type: _transactionType,
+        date: widget.transaction.date,
       );
 
-      context.read<HomeBloc>().add(AddTransaction(transaction));
+      context.read<HomeBloc>().add(EditTransaction(updatedTransaction));
 
       await Future.delayed(const Duration(milliseconds: 500));
 
@@ -96,9 +91,7 @@ class _AddTransactionScreenState extends State<AddTransactionScreen>
 
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(
-              '${widget.type == TransactionType.sale ? 'Sale' : 'Expense'} added successfully!',
-            ),
+            content: const Text('Transaction updated successfully!'),
             backgroundColor: Theme.of(context).colorScheme.primary,
             behavior: SnackBarBehavior.floating,
             shape: RoundedRectangleBorder(
@@ -110,16 +103,41 @@ class _AddTransactionScreenState extends State<AddTransactionScreen>
     }
   }
 
-  void _selectQuickDescription(String description) {
-    _descriptionController.text = description;
-    HapticFeedback.selectionClick();
+  Future<void> _delete() async {
+    setState(() {
+      _isLoading = true;
+    });
+
+    HapticFeedback.heavyImpact();
+
+    context.read<HomeBloc>().add(DeleteTransaction(widget.transaction.id));
+
+    await Future.delayed(const Duration(milliseconds: 500));
+
+    if (mounted) {
+      setState(() {
+        _isLoading = false;
+      });
+      Navigator.of(context).pop();
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: const Text('Transaction deleted successfully!'),
+          backgroundColor: Theme.of(context).colorScheme.error,
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+        ),
+      );
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
-    final isSale = widget.type == TransactionType.sale;
+    final isSale = _transactionType == TransactionType.sale;
     final primaryColor = isSale ? colorScheme.primary : colorScheme.error;
 
     return Scaffold(
@@ -132,24 +150,17 @@ class _AddTransactionScreenState extends State<AddTransactionScreen>
               Icon(Icons.arrow_back_ios_rounded, color: colorScheme.onSurface),
           onPressed: () => Navigator.pop(context),
         ),
-        title: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              isSale ? 'Add New Sale' : 'Add New Expense',
-              style: theme.textTheme.titleLarge?.copyWith(
-                fontWeight: FontWeight.bold,
-                color: colorScheme.onSurface,
-              ),
-            ),
-            Text(
-              'Track your ${isSale ? 'income' : 'spending'}',
-              style: theme.textTheme.bodySmall?.copyWith(
-                color: colorScheme.onSurface.withOpacity(0.6),
-              ),
-            ),
-          ],
+        title: Text(
+          'Edit Transaction',
+          style:
+              theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
         ),
+        actions: [
+          IconButton(
+            icon: Icon(FontAwesomeIcons.trashCan, color: colorScheme.error),
+            onPressed: _delete,
+          )
+        ],
       ),
       body: FadeTransition(
         opacity: _fadeAnimation,
@@ -165,18 +176,10 @@ class _AddTransactionScreenState extends State<AddTransactionScreen>
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
-                        TransactionTypeCard(
-                            theme: theme,
-                            colorScheme: colorScheme,
-                            primaryColor: primaryColor,
-                            isSale: isSale),
                         const SizedBox(height: 32),
                         _buildAmountInput(theme, colorScheme, primaryColor),
                         const SizedBox(height: 24),
                         _buildDescriptionInput(theme, colorScheme),
-                        const SizedBox(height: 20),
-                        _buildQuickDescriptions(
-                            theme, colorScheme, primaryColor),
                         const SizedBox(height: 32),
                         _buildSubmitButton(theme, primaryColor, isSale),
                       ],
@@ -300,57 +303,6 @@ class _AddTransactionScreenState extends State<AddTransactionScreen>
     );
   }
 
-  Widget _buildQuickDescriptions(
-      ThemeData theme, ColorScheme colorScheme, Color primaryColor) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          'Quick Options',
-          style: theme.textTheme.titleMedium?.copyWith(
-            fontWeight: FontWeight.w600,
-            color: colorScheme.onSurface,
-          ),
-        ),
-        const SizedBox(height: 12),
-        Wrap(
-          spacing: 8,
-          runSpacing: 8,
-          children: _quickDescriptions.map((description) {
-            return GestureDetector(
-              onTap: () => _selectQuickDescription(description),
-              child: Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-                decoration: BoxDecoration(
-                  color: colorScheme.surface,
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(
-                    color: colorScheme.outline.withOpacity(0.2),
-                  ),
-                  boxShadow: [
-                    BoxShadow(
-                      color: colorScheme.shadow.withOpacity(0.05),
-                      blurRadius: 4,
-                      offset: const Offset(0, 2),
-                    ),
-                  ],
-                ),
-                child: Text(
-                  description,
-                  style: theme.textTheme.bodyMedium?.copyWith(
-                    color: colorScheme.onSurface,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-              ),
-            );
-          }).toList(),
-        ),
-      ],
-    );
-  }
-
   Widget _buildSubmitButton(ThemeData theme, Color primaryColor, bool isSale) {
     return Container(
       decoration: BoxDecoration(
@@ -375,45 +327,10 @@ class _AddTransactionScreenState extends State<AddTransactionScreen>
           elevation: 0,
         ),
         child: _isLoading
-            ? Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  SizedBox(
-                    width: 20,
-                    height: 20,
-                    child: CircularProgressIndicator(
-                      color: Colors.white,
-                      strokeWidth: 2,
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  Text(
-                    'Adding...',
-                    style: theme.textTheme.titleMedium?.copyWith(
-                      color: Colors.white,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ],
+            ? const CircularProgressIndicator(
+                valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
               )
-            : Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  FaIcon(
-                    FontAwesomeIcons.plus,
-                    color: Colors.white,
-                    size: 16,
-                  ),
-                  const SizedBox(width: 12),
-                  Text(
-                    'Save ${isSale ? 'Sale' : 'Expense'}',
-                    style: theme.textTheme.titleMedium?.copyWith(
-                      color: Colors.white,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ],
-              ),
+            : const Text('Update Transaction'),
       ),
     );
   }

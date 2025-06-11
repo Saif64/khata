@@ -93,8 +93,6 @@ class _WeeklyNetWorthChartState extends State<WeeklyNetWorthChart>
   }
 
   Widget _buildHeader(ColorScheme colorScheme, List<_ChartData> summaries) {
-    final currentNetWorth =
-        summaries.isNotEmpty ? summaries.last.dailyNetWorth : 0.0;
     final weeklyChange = summaries.isNotEmpty
         ? summaries.last.dailyNetWorth - summaries.first.dailyNetWorth
         : 0.0;
@@ -262,7 +260,6 @@ class _WeeklyNetWorthChartState extends State<WeeklyNetWorthChart>
               ];
               final dayIndex = spot.x.toInt();
 
-              // Add bounds checking
               if (dayIndex < 0 ||
                   dayIndex >= days.length ||
                   dayIndex >= summaries.length) {
@@ -390,7 +387,6 @@ class _WeeklyNetWorthChartState extends State<WeeklyNetWorthChart>
               dailyNetWorth: 0,
             ));
 
-    // Calculate daily sales and expenses
     for (final transaction in transactions) {
       for (int i = 0; i < last7Days.length; i++) {
         final day = last7Days[i];
@@ -406,8 +402,6 @@ class _WeeklyNetWorthChartState extends State<WeeklyNetWorthChart>
       }
     }
 
-    // Calculate cumulative net worth
-    double runningTotal = 0;
     for (int i = 0; i < summaries.length; i++) {
       final dailyNet = summaries[i].sales - summaries[i].expenses;
       summaries[i].dailyNetWorth = dailyNet;

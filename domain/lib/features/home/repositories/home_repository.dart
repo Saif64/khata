@@ -6,6 +6,9 @@ abstract class HomeRepository {
   Future<Either<AuthFailure, void>> addTransaction(
       TransactionEntity transaction);
   Future<Either<AuthFailure, List<TransactionEntity>>> getTransactions();
+  Future<Either<AuthFailure, void>> editTransaction(
+      TransactionEntity transaction);
+  Future<Either<AuthFailure, void>> deleteTransaction(String transactionId);
   Future<Either<AuthFailure, void>> syncTransactions();
   Stream<String> get syncStatus;
 }

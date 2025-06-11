@@ -11,6 +11,8 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
   HomeBloc(this.homeRepository) : super(HomeInitial()) {
     on<LoadHomeData>(_onLoadHomeData);
     on<AddTransaction>(_onAddTransaction);
+    on<EditTransaction>(_onEditTransaction);
+    on<DeleteTransaction>(_onDeleteTransaction);
     on<FilterTransactions>(_onFilterTransactions);
 
     homeRepository.syncStatus.listen((status) {
@@ -41,6 +43,26 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     final failureOrVoid =
         await homeRepository.addTransaction(event.transaction);
 
+    failureOrVoid.fold(
+      (failure) => emit(HomeError(failure.message)),
+      (_) => add(LoadHomeData()),
+    );
+  }
+
+  Future<void> _onEditTransaction(
+      EditTransaction event, Emitter<HomeState> emit) async {
+    final failureOrVoid =
+        await homeRepository.editTransaction(event.transaction);
+    failureOrVoid.fold(
+      (failure) => emit(HomeError(failure.message)),
+      (_) => add(LoadHomeData()),
+    );
+  }
+
+  Future<void> _onDeleteTransaction(
+      DeleteTransaction event, Emitter<HomeState> emit) async {
+    final failureOrVoid =
+        await homeRepository.deleteTransaction(event.transactionId);
     failureOrVoid.fold(
       (failure) => emit(HomeError(failure.message)),
       (_) => add(LoadHomeData()),

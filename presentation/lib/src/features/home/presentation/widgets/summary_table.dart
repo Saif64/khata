@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:presentation/src/features/home/presentation/widgets/summary_comparison_item.dart';
+import 'package:presentation/src/features/home/presentation/widgets/summary_item.dart';
 
 class SummaryWidget extends StatelessWidget {
   final double todaysSales;
@@ -26,7 +28,6 @@ class SummaryWidget extends StatelessWidget {
 
     return Column(
       children: [
-        // Main summary card
         Container(
           padding: const EdgeInsets.all(24),
           decoration: BoxDecoration(
@@ -70,13 +71,12 @@ class SummaryWidget extends StatelessWidget {
               Row(
                 children: [
                   Expanded(
-                    child: _buildSummaryItem(
-                      'Sales',
-                      todaysSales,
-                      FontAwesomeIcons.arrowTrendUp,
-                      theme,
-                      true,
-                    ),
+                    child: SummaryItem(
+                        label: 'Sales',
+                        amount: todaysSales,
+                        icon: FontAwesomeIcons.arrowTrendUp,
+                        theme: theme,
+                        isPositive: true),
                   ),
                   Container(
                     height: 40,
@@ -85,13 +85,12 @@ class SummaryWidget extends StatelessWidget {
                     margin: const EdgeInsets.symmetric(horizontal: 20),
                   ),
                   Expanded(
-                    child: _buildSummaryItem(
-                      'Expenses',
-                      todaysSpending,
-                      FontAwesomeIcons.arrowTrendDown,
-                      theme,
-                      false,
-                    ),
+                    child: SummaryItem(
+                        label: 'Expenses',
+                        amount: todaysSpending,
+                        icon: FontAwesomeIcons.arrowTrendDown,
+                        theme: theme,
+                        isPositive: false),
                   ),
                 ],
               ),
@@ -167,10 +166,7 @@ class SummaryWidget extends StatelessWidget {
             ],
           ),
         ),
-
         const SizedBox(height: 16),
-
-        // Yesterday comparison
         Container(
           padding: const EdgeInsets.all(20),
           decoration: BoxDecoration(
@@ -201,23 +197,21 @@ class SummaryWidget extends StatelessWidget {
               Row(
                 children: [
                   Expanded(
-                    child: _buildComparisonItem(
-                      'Sales',
-                      yesterdaysSales,
-                      FontAwesomeIcons.chartSimple,
-                      colorScheme.primary,
-                      theme,
-                    ),
+                    child: SummaryComparisonItem(
+                        label: 'Sales',
+                        amount: yesterdaysSales,
+                        icon: FontAwesomeIcons.chartSimple,
+                        color: colorScheme.primary,
+                        theme: theme),
                   ),
                   const SizedBox(width: 16),
                   Expanded(
-                    child: _buildComparisonItem(
-                      'Expenses',
-                      yesterdaysSpending,
-                      FontAwesomeIcons.receipt,
-                      colorScheme.error,
-                      theme,
-                    ),
+                    child: SummaryComparisonItem(
+                        label: 'Expenses',
+                        amount: yesterdaysSpending,
+                        icon: FontAwesomeIcons.receipt,
+                        color: colorScheme.error,
+                        theme: theme),
                   ),
                 ],
               ),
@@ -252,91 +246,6 @@ class SummaryWidget extends StatelessWidget {
           ),
         ),
       ],
-    );
-  }
-
-  Widget _buildSummaryItem(
-    String label,
-    double amount,
-    IconData icon,
-    ThemeData theme,
-    bool isPositive,
-  ) {
-    return Column(
-      children: [
-        Container(
-          padding: const EdgeInsets.all(8),
-          decoration: BoxDecoration(
-            color: Colors.white.withOpacity(0.1),
-            borderRadius: BorderRadius.circular(8),
-          ),
-          child: FaIcon(
-            icon,
-            color: Colors.white,
-            size: 16,
-          ),
-        ),
-        const SizedBox(height: 8),
-        Text(
-          label,
-          style: theme.textTheme.bodySmall?.copyWith(
-            color: Colors.white.withOpacity(0.8),
-            fontWeight: FontWeight.w500,
-          ),
-        ),
-        const SizedBox(height: 4),
-        Text(
-          '\$${amount.toStringAsFixed(2)}',
-          style: theme.textTheme.titleLarge?.copyWith(
-            color: Colors.white,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildComparisonItem(
-    String label,
-    double amount,
-    IconData icon,
-    Color color,
-    ThemeData theme,
-  ) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: color.withOpacity(0.2),
-        ),
-      ),
-      child: Column(
-        children: [
-          FaIcon(
-            icon,
-            color: color,
-            size: 20,
-          ),
-          const SizedBox(height: 8),
-          Text(
-            label,
-            style: theme.textTheme.bodySmall?.copyWith(
-              color: color,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-          const SizedBox(height: 4),
-          Text(
-            '\$${amount.toStringAsFixed(2)}',
-            style: theme.textTheme.titleMedium?.copyWith(
-              color: theme.colorScheme.onSurface,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-        ],
-      ),
     );
   }
 }

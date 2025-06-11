@@ -1,4 +1,4 @@
-import 'package:domain/domain.dart'; // For UserEntity
+import 'package:domain/domain.dart';
 import 'package:equatable/equatable.dart';
 
 abstract class AuthEvent extends Equatable {

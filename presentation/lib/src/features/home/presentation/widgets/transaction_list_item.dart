@@ -1,16 +1,16 @@
 import 'package:domain/domain.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:presentation/core/routes.dart';
+import 'package:presentation/core/utils/time_utils.dart';
 
 class TransactionListItem extends StatefulWidget {
   final TransactionEntity transaction;
-  final VoidCallback? onTap;
   final VoidCallback? onLongPress;
 
   const TransactionListItem({
     super.key,
     required this.transaction,
-    this.onTap,
     this.onLongPress,
   });
 
@@ -51,6 +51,8 @@ class _TransactionListItemState extends State<TransactionListItem>
 
   void _onTapUp(TapUpDetails details) {
     _animationController.reverse();
+    Navigator.pushNamed(context, Routes.EDIT_TRANSACTION,
+        arguments: widget.transaction);
   }
 
   void _onTapCancel() {
@@ -73,7 +75,6 @@ class _TransactionListItemState extends State<TransactionListItem>
         onTapDown: _onTapDown,
         onTapUp: _onTapUp,
         onTapCancel: _onTapCancel,
-        onTap: widget.onTap,
         onLongPress: widget.onLongPress,
         child: Container(
           margin: const EdgeInsets.only(bottom: 12),
@@ -96,7 +97,6 @@ class _TransactionListItemState extends State<TransactionListItem>
             borderRadius: BorderRadius.circular(20),
             child: Stack(
               children: [
-                // Colored accent bar
                 Positioned(
                   left: 0,
                   top: 0,
@@ -112,12 +112,10 @@ class _TransactionListItemState extends State<TransactionListItem>
                     ),
                   ),
                 ),
-                // Main content
                 Padding(
                   padding: const EdgeInsets.all(20),
                   child: Row(
                     children: [
-                      // Icon container
                       Container(
                         padding: const EdgeInsets.all(12),
                         decoration: BoxDecoration(
@@ -135,8 +133,6 @@ class _TransactionListItemState extends State<TransactionListItem>
                         ),
                       ),
                       const SizedBox(width: 16),
-
-                      // Transaction details
                       Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -173,7 +169,7 @@ class _TransactionListItemState extends State<TransactionListItem>
                                 ),
                                 const SizedBox(width: 8),
                                 Text(
-                                  _formatDate(widget.transaction.date),
+                                  TimeUtils.formatDate(widget.transaction.date),
                                   style: theme.textTheme.bodySmall?.copyWith(
                                     color:
                                         colorScheme.onSurface.withOpacity(0.6),
@@ -185,8 +181,6 @@ class _TransactionListItemState extends State<TransactionListItem>
                           ],
                         ),
                       ),
-
-                      // Amount
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.end,
                         children: [
@@ -200,7 +194,7 @@ class _TransactionListItemState extends State<TransactionListItem>
                           ),
                           const SizedBox(height: 4),
                           Text(
-                            _formatTime(widget.transaction.date),
+                            TimeUtils.formatTime(widget.transaction.date),
                             style: theme.textTheme.bodySmall?.copyWith(
                               color: colorScheme.onSurface.withOpacity(0.5),
                               fontWeight: FontWeight.w500,
@@ -217,44 +211,5 @@ class _TransactionListItemState extends State<TransactionListItem>
         ),
       ),
     );
-  }
-
-  String _formatDate(DateTime date) {
-    final now = DateTime.now();
-    final today = DateTime(now.year, now.month, now.day);
-    final yesterday = today.subtract(const Duration(days: 1));
-    final dateOnly = DateTime(date.year, date.month, date.day);
-
-    if (dateOnly == today) {
-      return 'Today';
-    } else if (dateOnly == yesterday) {
-      return 'Yesterday';
-    } else {
-      final months = [
-        'Jan',
-        'Feb',
-        'Mar',
-        'Apr',
-        'May',
-        'Jun',
-        'Jul',
-        'Aug',
-        'Sep',
-        'Oct',
-        'Nov',
-        'Dec'
-      ];
-      return '${months[date.month - 1]} ${date.day}';
-    }
-  }
-
-  String _formatTime(DateTime date) {
-    final hour = date.hour;
-    final minute = date.minute;
-    final period = hour >= 12 ? 'PM' : 'AM';
-    final displayHour = hour == 0 ? 12 : (hour > 12 ? hour - 12 : hour);
-    final displayMinute = minute.toString().padLeft(2, '0');
-
-    return '$displayHour:$displayMinute $period';
   }
 }

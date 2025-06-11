@@ -1,8 +1,8 @@
 import 'package:domain/domain.dart';
 import 'package:flutter/material.dart';
+import 'package:presentation/src/features/home/presentation/widgets/transaction_list_item.dart';
 
 import 'empty_home_widget.dart';
-import 'transaction_items_widget.dart';
 
 class TransactionListWidget extends StatelessWidget {
   const TransactionListWidget({
@@ -21,7 +21,9 @@ class TransactionListWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (transactions.isEmpty) {
-      return EmptyHomeScreen(theme: theme, colorScheme: colorScheme);
+      return SliverFillRemaining(
+        child: EmptyHomeScreen(theme: theme, colorScheme: colorScheme),
+      );
     }
 
     List<TransactionEntity> filteredTransactions = transactions;
@@ -37,23 +39,18 @@ class TransactionListWidget extends StatelessWidget {
 
     final recentTransactions = filteredTransactions.take(10).toList();
 
-    return Padding(
+    return SliverPadding(
       padding: const EdgeInsets.symmetric(horizontal: 20),
-      child: Column(
-        children: recentTransactions.asMap().entries.map((entry) {
-          final index = entry.key;
-          final transaction = entry.value;
-          return AnimatedContainer(
-            duration: Duration(milliseconds: 200 + (index * 50)),
-            child: Padding(
-              padding: const EdgeInsets.only(bottom: 12),
-              child: TransactionItemsWidget(
-                  transaction: transaction,
-                  theme: theme,
-                  colorScheme: colorScheme),
-            ),
-          );
-        }).toList(),
+      sliver: SliverList(
+        delegate: SliverChildBuilderDelegate(
+          (context, index) {
+            final transaction = recentTransactions[index];
+            return TransactionListItem(
+              transaction: transaction,
+            );
+          },
+          childCount: recentTransactions.length,
+        ),
       ),
     );
   }
