@@ -1,22 +1,26 @@
+// presentation/lib/src/features/home/presentation/screens/all_transactions_screen.dart
+
 import 'package:domain/domain.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:presentation/core/theme/app_theme.dart';
+import 'package:presentation/src/features/home/presentation/bloc/home_bloc.dart';
+import 'package:presentation/src/features/home/presentation/bloc/home_state.dart';
 import 'package:presentation/src/features/home/presentation/widgets/transaction_list_item.dart';
 
 import '../../../../../core/widgets/back_button.dart';
+import '../../../../../core/widgets/loader.dart';
 
 class AllTransactionsScreen extends StatefulWidget {
-  final List<TransactionEntity> transactions;
-
-  const AllTransactionsScreen({super.key, required this.transactions});
+  // The static list is removed from the constructor
+  const AllTransactionsScreen({super.key});
 
   @override
   State<AllTransactionsScreen> createState() => _AllTransactionsScreenState();
 }
 
 class _AllTransactionsScreenState extends State<AllTransactionsScreen> {
-  late List<TransactionEntity> _filteredTransactions;
   String _selectedFilter = 'This month';
   final List<String> _dateFilters = [
     'This week',
@@ -26,23 +30,57 @@ class _AllTransactionsScreenState extends State<AllTransactionsScreen> {
   ];
 
   @override
-  void initState() {
-    super.initState();
-    _filteredTransactions = widget.transactions;
-    _filterTransactions(_selectedFilter);
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
+    return Scaffold(
+      backgroundColor: theme.scaffoldBackgroundColor,
+      // The body is now wrapped in a BlocBuilder
+      body: BlocBuilder<HomeBloc, HomeState>(
+        builder: (context, state) {
+          if (state is HomeLoading) {
+            return const Loader();
+          }
+          if (state is HomeError) {
+            return Center(child: Text(state.message));
+          }
+          if (state is HomeLoaded) {
+            // Filter the transactions from the current state
+            final filteredTransactions =
+                _getFilteredTransactions(state.transactions);
+
+            return CustomScrollView(
+              slivers: [
+                _buildSliverAppBar(theme, colorScheme),
+                SliverToBoxAdapter(
+                  child: _buildFilterSection(
+                      theme, colorScheme, filteredTransactions.length),
+                ),
+                _buildTransactionsList(
+                    theme, colorScheme, filteredTransactions),
+              ],
+            );
+          }
+          return const Center(child: Text('No transactions found.'));
+        },
+      ),
+    );
   }
 
-  void _filterTransactions(String filter) {
+  List<TransactionEntity> _getFilteredTransactions(
+      List<TransactionEntity> allTransactions) {
     final now = DateTime.now();
     DateTime startDate;
     DateTime endDate;
 
-    switch (filter) {
+    switch (_selectedFilter) {
       case 'This week':
         final weekDay = now.weekday;
         startDate = DateTime(now.year, now.month, now.day - (weekDay - 1));
         endDate = DateTime(now.year, now.month, now.day, 23, 59, 59);
         break;
+      // ... other cases remain the same
       case 'Last week':
         final weekDay = now.weekday;
         startDate = DateTime(now.year, now.month, now.day - (weekDay - 1) - 7);
@@ -58,46 +96,25 @@ class _AllTransactionsScreenState extends State<AllTransactionsScreen> {
         endDate = DateTime(now.year, now.month, 0, 23, 59, 59);
         break;
       default:
-        setState(() {
-          _filteredTransactions = widget.transactions;
-        });
-        return;
+        return allTransactions;
     }
 
-    setState(() {
-      _filteredTransactions = widget.transactions.where((t) {
-        final transactionDate = DateTime(t.date.year, t.date.month, t.date.day);
-        final start = DateTime(startDate.year, startDate.month, startDate.day);
-        final end = DateTime(endDate.year, endDate.month, endDate.day);
-
-        return (transactionDate.isAtSameMomentAs(start) ||
-                transactionDate.isAfter(start)) &&
-            (transactionDate.isAtSameMomentAs(end) ||
-                transactionDate.isBefore(end));
-      }).toList();
-    });
+    return allTransactions.where((t) {
+      final transactionDate = DateTime(t.date.year, t.date.month, t.date.day);
+      final start = DateTime(startDate.year, startDate.month, startDate.day);
+      final end = DateTime(endDate.year, endDate.month, endDate.day);
+      return (transactionDate.isAtSameMomentAs(start) ||
+              transactionDate.isAfter(start)) &&
+          (transactionDate.isAtSameMomentAs(end) ||
+              transactionDate.isBefore(end));
+    }).toList();
   }
 
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
-
-    return Scaffold(
-      backgroundColor: theme.scaffoldBackgroundColor,
-      body: CustomScrollView(
-        slivers: [
-          _buildSliverAppBar(theme, colorScheme),
-          SliverToBoxAdapter(
-            child: _buildFilterSection(theme, colorScheme),
-          ),
-          _buildTransactionsList(theme, colorScheme),
-        ],
-      ),
-    );
-  }
+  // Helper methods like _buildSliverAppBar, _buildFilterSection, etc. remain the same,
+  // but _buildFilterSection now takes the count of filtered transactions.
 
   Widget _buildSliverAppBar(ThemeData theme, ColorScheme colorScheme) {
+    // ... no changes here
     return SliverAppBar(
       expandedHeight: 120,
       floating: false,
@@ -120,7 +137,9 @@ class _AllTransactionsScreenState extends State<AllTransactionsScreen> {
     );
   }
 
-  Widget _buildFilterSection(ThemeData theme, ColorScheme colorScheme) {
+  Widget _buildFilterSection(
+      ThemeData theme, ColorScheme colorScheme, int count) {
+    // ... updated to use the count parameter
     return Container(
       margin: const EdgeInsets.all(20),
       padding: const EdgeInsets.all(20),
@@ -159,7 +178,7 @@ class _AllTransactionsScreenState extends State<AllTransactionsScreen> {
           _buildDateFilterDropdown(theme, colorScheme),
           const SizedBox(height: 12),
           Text(
-            '${_filteredTransactions.length} transactions found',
+            '$count transactions found',
             style: theme.textTheme.bodySmall?.copyWith(
               color: colorScheme.onSurfaceVariant,
             ),
@@ -170,6 +189,7 @@ class _AllTransactionsScreenState extends State<AllTransactionsScreen> {
   }
 
   Widget _buildDateFilterDropdown(ThemeData theme, ColorScheme colorScheme) {
+    // ... no changes here
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
       decoration: BoxDecoration(
@@ -205,7 +225,6 @@ class _AllTransactionsScreenState extends State<AllTransactionsScreen> {
               setState(() {
                 _selectedFilter = newValue;
               });
-              _filterTransactions(newValue);
             }
           },
         ),
@@ -213,8 +232,9 @@ class _AllTransactionsScreenState extends State<AllTransactionsScreen> {
     );
   }
 
-  Widget _buildTransactionsList(ThemeData theme, ColorScheme colorScheme) {
-    if (_filteredTransactions.isEmpty) {
+  Widget _buildTransactionsList(ThemeData theme, ColorScheme colorScheme,
+      List<TransactionEntity> transactions) {
+    if (transactions.isEmpty) {
       return SliverFillRemaining(
         child: _buildEmptyState(theme, colorScheme),
       );
@@ -225,7 +245,7 @@ class _AllTransactionsScreenState extends State<AllTransactionsScreen> {
       sliver: SliverList(
         delegate: SliverChildBuilderDelegate(
           (context, index) {
-            final transaction = _filteredTransactions[index];
+            final transaction = transactions[index];
             return Container(
               margin: const EdgeInsets.only(bottom: 12),
               decoration: BoxDecoration(
@@ -244,13 +264,14 @@ class _AllTransactionsScreenState extends State<AllTransactionsScreen> {
               ),
             );
           },
-          childCount: _filteredTransactions.length,
+          childCount: transactions.length,
         ),
       ),
     );
   }
 
   Widget _buildEmptyState(ThemeData theme, ColorScheme colorScheme) {
+    // ... no changes here
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,

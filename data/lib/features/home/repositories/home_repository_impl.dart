@@ -29,7 +29,6 @@ class HomeRepositoryImpl implements HomeRepository {
   Future<Either<AuthFailure, List<TransactionEntity>>> getTransactions() async {
     try {
       await syncTransactions();
-
       final transactions = await localDataSource.getTransactions();
       return Right(transactions);
     } catch (e) {
@@ -43,7 +42,10 @@ class HomeRepositoryImpl implements HomeRepository {
       String transactionId) async {
     try {
       await localDataSource.deleteTransaction(transactionId);
-      await remoteDataSource.deleteTransaction(transactionId);
+
+      await remoteDataSource
+          .deleteTransaction(transactionId)
+          .catchError((_) {});
       return const Right(null);
     } catch (e) {
       return Left(UnknownFailure(e.toString()));
@@ -55,7 +57,8 @@ class HomeRepositoryImpl implements HomeRepository {
       TransactionEntity transaction) async {
     try {
       await localDataSource.editTransaction(transaction);
-      await remoteDataSource.editTransaction(transaction);
+
+      await syncTransactions();
       return const Right(null);
     } catch (e) {
       return Left(UnknownFailure(e.toString()));
@@ -84,7 +87,6 @@ class HomeRepositoryImpl implements HomeRepository {
       return const Right(null);
     } catch (e) {
       _syncStatusController.add('Error');
-
       return Left(
           NetworkFailure("Failed to sync transactions: ${e.toString()}"));
     }
