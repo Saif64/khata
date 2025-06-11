@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:presentation/core/theme/app_theme.dart';
 
+import '../../../../../core/widgets/back_button.dart';
 import '../../provider/auth.dart';
 
 class SignUpScreen extends StatefulWidget {
@@ -71,13 +72,7 @@ class _SignUpScreenState extends State<SignUpScreen>
       extendBodyBehindAppBar: true,
       appBar: AppBar(
         elevation: 0,
-        leading: IconButton(
-          icon: Icon(
-            FontAwesomeIcons.arrowLeftLong,
-            color: theme.appBarTheme.foregroundColor,
-          ),
-          onPressed: () => Navigator.pop(context),
-        ),
+        leading: const ThemedIconButton.back(),
       ),
       body: BlocListener<AuthBloc, AuthState>(
         listener: (context, state) {

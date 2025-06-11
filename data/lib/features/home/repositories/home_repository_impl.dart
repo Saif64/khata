@@ -39,6 +39,30 @@ class HomeRepositoryImpl implements HomeRepository {
   }
 
   @override
+  Future<Either<AuthFailure, void>> deleteTransaction(
+      String transactionId) async {
+    try {
+      await localDataSource.deleteTransaction(transactionId);
+      await remoteDataSource.deleteTransaction(transactionId);
+      return const Right(null);
+    } catch (e) {
+      return Left(UnknownFailure(e.toString()));
+    }
+  }
+
+  @override
+  Future<Either<AuthFailure, void>> editTransaction(
+      TransactionEntity transaction) async {
+    try {
+      await localDataSource.editTransaction(transaction);
+      await remoteDataSource.editTransaction(transaction);
+      return const Right(null);
+    } catch (e) {
+      return Left(UnknownFailure(e.toString()));
+    }
+  }
+
+  @override
   Future<Either<AuthFailure, void>> syncTransactions() async {
     _syncStatusController.add('Syncing');
     try {

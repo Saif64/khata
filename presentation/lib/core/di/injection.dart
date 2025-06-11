@@ -6,6 +6,7 @@ import 'package:presentation/src/features/home/presentation/bloc/home_bloc.dart'
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../src/features/auth/provider/auth.dart';
+import '../../src/features/home/presentation/bloc/transaction_bloc.dart';
 
 final di = GetIt.instance;
 

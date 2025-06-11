@@ -3,8 +3,10 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 abstract class HomeRemoteDataSource {
   Future<void> syncTransactions(List<TransactionEntity> transactions);
-  // Add this method to get transactions from remote
   Future<List<TransactionEntity>> getTransactions();
+
+  Future<void> deleteTransaction(String transactionId);
+  Future<void> editTransaction(TransactionEntity transaction);
 }
 
 class HomeRemoteDataSourceImpl implements HomeRemoteDataSource {
@@ -31,6 +33,21 @@ class HomeRemoteDataSourceImpl implements HomeRemoteDataSource {
             ))
         .toList();
     return transactions;
+  }
+
+  @override
+  Future<void> deleteTransaction(String transactionId) async {
+    await supabaseClient.from('transactions').delete().eq('id', transactionId);
+  }
+
+  @override
+  Future<void> editTransaction(TransactionEntity transaction) async {
+    await supabaseClient.from('transactions').update({
+      'amount': transaction.amount,
+      'description': transaction.description,
+      'type': transaction.type.toString(),
+      'date': transaction.date.toIso8601String(),
+    }).eq('id', transaction.id);
   }
 
   @override

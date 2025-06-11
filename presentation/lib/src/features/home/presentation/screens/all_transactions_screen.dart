@@ -1,7 +1,10 @@
 import 'package:domain/domain.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:presentation/core/theme/app_theme.dart';
 import 'package:presentation/src/features/home/presentation/widgets/transaction_list_item.dart';
+
+import '../../../../../core/widgets/back_button.dart';
 
 class AllTransactionsScreen extends StatefulWidget {
   final List<TransactionEntity> transactions;
@@ -63,8 +66,14 @@ class _AllTransactionsScreenState extends State<AllTransactionsScreen> {
 
     setState(() {
       _filteredTransactions = widget.transactions.where((t) {
-        return t.date.isAfter(startDate.subtract(const Duration(seconds: 1))) &&
-            t.date.isBefore(endDate);
+        final transactionDate = DateTime(t.date.year, t.date.month, t.date.day);
+        final start = DateTime(startDate.year, startDate.month, startDate.day);
+        final end = DateTime(endDate.year, endDate.month, endDate.day);
+
+        return (transactionDate.isAtSameMomentAs(start) ||
+                transactionDate.isAfter(start)) &&
+            (transactionDate.isAtSameMomentAs(end) ||
+                transactionDate.isBefore(end));
       }).toList();
     });
   }
@@ -73,55 +82,118 @@ class _AllTransactionsScreenState extends State<AllTransactionsScreen> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
+
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('All Transactions'),
-        centerTitle: true,
-        leading: IconButton(
-          icon: Icon(
-            FontAwesomeIcons.arrowLeftLong,
-            color: theme.appBarTheme.foregroundColor,
+      backgroundColor: theme.scaffoldBackgroundColor,
+      body: CustomScrollView(
+        slivers: [
+          _buildSliverAppBar(theme, colorScheme),
+          SliverToBoxAdapter(
+            child: _buildFilterSection(theme, colorScheme),
           ),
-          onPressed: () => Navigator.pop(context),
-        ),
+          _buildTransactionsList(theme, colorScheme),
+        ],
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: _buildDateFilterDropdown(theme, colorScheme),
-            ),
-            Expanded(
-              child: ListView.builder(
-                itemCount: _filteredTransactions.length,
-                itemBuilder: (context, index) {
-                  final transaction = _filteredTransactions[index];
-                  return TransactionListItem(
-                    transaction: transaction,
-                  );
-                },
-              ),
-            ),
-          ],
+    );
+  }
+
+  Widget _buildSliverAppBar(ThemeData theme, ColorScheme colorScheme) {
+    return SliverAppBar(
+      expandedHeight: 120,
+      floating: false,
+      pinned: true,
+      elevation: 0,
+      backgroundColor: theme.scaffoldBackgroundColor,
+      surfaceTintColor: Colors.transparent,
+      leading: const ThemedIconButton.back(),
+      flexibleSpace: FlexibleSpaceBar(
+        title: Text(
+          'All Transactions',
+          style: theme.textTheme.headlineSmall?.copyWith(
+            fontWeight: FontWeight.w700,
+            color: colorScheme.onSurface,
+          ),
         ),
+        centerTitle: false,
+        titlePadding: const EdgeInsets.only(left: 72, bottom: 16),
+      ),
+    );
+  }
+
+  Widget _buildFilterSection(ThemeData theme, ColorScheme colorScheme) {
+    return Container(
+      margin: const EdgeInsets.all(20),
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: colorScheme.cardBackground,
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: colorScheme.onSurface.withOpacity(0.05),
+            blurRadius: 10,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(
+                FontAwesomeIcons.filter,
+                color: colorScheme.primary,
+                size: 16,
+              ),
+              const SizedBox(width: 8),
+              Text(
+                'Filter Period',
+                style: theme.textTheme.titleSmall?.copyWith(
+                  fontWeight: FontWeight.w600,
+                  color: colorScheme.onSurface,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+          _buildDateFilterDropdown(theme, colorScheme),
+          const SizedBox(height: 12),
+          Text(
+            '${_filteredTransactions.length} transactions found',
+            style: theme.textTheme.bodySmall?.copyWith(
+              color: colorScheme.onSurfaceVariant,
+            ),
+          ),
+        ],
       ),
     );
   }
 
   Widget _buildDateFilterDropdown(ThemeData theme, ColorScheme colorScheme) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
       decoration: BoxDecoration(
-        color: colorScheme.surface,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: colorScheme.outline.withOpacity(0.2)),
+        color: colorScheme.surfaceVariant,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: colorScheme.outline.withOpacity(0.1),
+          width: 1,
+        ),
       ),
       child: DropdownButtonHideUnderline(
         child: DropdownButton<String>(
           value: _selectedFilter,
           isExpanded: true,
+          icon: Icon(
+            FontAwesomeIcons.chevronDown,
+            color: colorScheme.onSurfaceVariant,
+            size: 14,
+          ),
+          style: theme.textTheme.bodyMedium?.copyWith(
+            fontWeight: FontWeight.w500,
+            color: colorScheme.onSurface,
+          ),
+          borderRadius: BorderRadius.circular(12),
           items: _dateFilters.map<DropdownMenuItem<String>>((String value) {
             return DropdownMenuItem<String>(
               value: value,
@@ -137,6 +209,80 @@ class _AllTransactionsScreenState extends State<AllTransactionsScreen> {
             }
           },
         ),
+      ),
+    );
+  }
+
+  Widget _buildTransactionsList(ThemeData theme, ColorScheme colorScheme) {
+    if (_filteredTransactions.isEmpty) {
+      return SliverFillRemaining(
+        child: _buildEmptyState(theme, colorScheme),
+      );
+    }
+
+    return SliverPadding(
+      padding: const EdgeInsets.symmetric(horizontal: 20),
+      sliver: SliverList(
+        delegate: SliverChildBuilderDelegate(
+          (context, index) {
+            final transaction = _filteredTransactions[index];
+            return Container(
+              margin: const EdgeInsets.only(bottom: 12),
+              decoration: BoxDecoration(
+                color: colorScheme.cardBackground,
+                borderRadius: BorderRadius.circular(16),
+                boxShadow: [
+                  BoxShadow(
+                    color: colorScheme.onSurface.withOpacity(0.03),
+                    blurRadius: 8,
+                    offset: const Offset(0, 1),
+                  ),
+                ],
+              ),
+              child: TransactionListItem(
+                transaction: transaction,
+              ),
+            );
+          },
+          childCount: _filteredTransactions.length,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildEmptyState(ThemeData theme, ColorScheme colorScheme) {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Container(
+            padding: const EdgeInsets.all(24),
+            decoration: BoxDecoration(
+              color: colorScheme.surfaceVariant,
+              shape: BoxShape.circle,
+            ),
+            child: Icon(
+              FontAwesomeIcons.receipt,
+              color: colorScheme.onSurfaceVariant,
+              size: 32,
+            ),
+          ),
+          const SizedBox(height: 24),
+          Text(
+            'No transactions found',
+            style: theme.textTheme.titleMedium?.copyWith(
+              fontWeight: FontWeight.w600,
+              color: colorScheme.onSurface,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            'Try selecting a different time period',
+            style: theme.textTheme.bodyMedium?.copyWith(
+              color: colorScheme.onSurfaceVariant,
+            ),
+          ),
+        ],
       ),
     );
   }

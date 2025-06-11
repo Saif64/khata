@@ -10,7 +10,7 @@ class Loader extends StatelessWidget {
       backgroundColor: Theme.of(context).colorScheme.surface,
       body: Center(
         child: SpinKitThreeInOut(
-          color: Theme.of(context).primaryColor,
+          color: Theme.of(context).colorScheme.secondary,
           size: 100.0,
         ),
       ),
