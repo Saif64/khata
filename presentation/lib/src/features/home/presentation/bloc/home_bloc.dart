@@ -31,8 +31,10 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
 
   Future<void> _onAddTransaction(
       AddTransaction event, Emitter<HomeState> emit) async {
+    emit(HomeLoading());
     final failureOrVoid =
         await homeRepository.addTransaction(event.transaction);
+
     failureOrVoid.fold(
       (failure) => emit(HomeError(failure.message)),
       (_) => add(LoadHomeData()),
