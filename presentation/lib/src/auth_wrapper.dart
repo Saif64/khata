@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:presentation/core/widgets/loader.dart';
 
 import 'features/auth/presentation/screens/sign_in_screen.dart';
 import 'features/auth/provider/auth.dart';
@@ -19,9 +20,7 @@ class AuthWrapper extends StatelessWidget {
           return const SignInScreen();
         }
 
-        return const Scaffold(
-          body: Center(child: CircularProgressIndicator()),
-        );
+        return Loader();
       },
     );
   }

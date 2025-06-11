@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:lottie/lottie.dart';
 import 'package:presentation/core/theme/app_theme.dart';
+import 'package:presentation/core/widgets/loader.dart';
 
 import '../../provider/auth.dart';
 import '../../widgets/social_buttons.dart';
@@ -68,11 +70,6 @@ class _SignInScreenState extends State<SignInScreen>
     final isDarkMode = theme.brightness == Brightness.dark;
 
     return Scaffold(
-      extendBodyBehindAppBar: true,
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-      ),
       body: BlocListener<AuthBloc, AuthState>(
         listener: (context, state) {
           setState(() {
@@ -105,240 +102,216 @@ class _SignInScreenState extends State<SignInScreen>
             );
           }
         },
-        child: SafeArea(
-          child: FadeTransition(
-            opacity: _fadeAnimation,
-            child: Padding(
-              padding: const EdgeInsets.all(24.0),
-              child: Column(
-                children: [
-                  Expanded(
-                    child: SingleChildScrollView(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: [
-                          const SizedBox(height: 40),
-                          // Welcome Text
-                          Text(
-                            'Welcome to your Khata',
-                            style: theme.textTheme.headlineLarge?.copyWith(
-                              color: isDarkMode ? Colors.white : Colors.black,
-                              fontWeight: FontWeight.bold,
-                            ),
-                            textAlign: TextAlign.center,
+        child: FadeTransition(
+          opacity: _fadeAnimation,
+          child: Padding(
+            padding: const EdgeInsets.all(24.0),
+            child: _isLoading
+                ? Loader()
+                : Column(
+                    children: [
+                      Expanded(
+                        child: SingleChildScrollView(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: [
+                              const SizedBox(height: 40),
+                              // Welcome Text
+                              Text(
+                                'Welcome to your Khata',
+                                style: theme.textTheme.headlineLarge?.copyWith(
+                                  color:
+                                      isDarkMode ? Colors.white : Colors.black,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                                textAlign: TextAlign.center,
+                              ),
+
+                              Lottie.asset(
+                                'assets/animations/login_book.json',
+                                frameRate: FrameRate.composition,
+                                height: 125,
+                                renderCache: RenderCache.raster,
+                              ),
+                              const SizedBox(height: 8),
+
+                              // Form Card
+                              Container(
+                                padding: const EdgeInsets.all(24),
+                                decoration: BoxDecoration(
+                                  color: colorScheme.cardBackground,
+                                  borderRadius: BorderRadius.circular(24),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Colors.black.withOpacity(0.05),
+                                      blurRadius: 20,
+                                      offset: const Offset(0, 10),
+                                    ),
+                                  ],
+                                ),
+                                child: Form(
+                                  key: _formKey,
+                                  child: Column(
+                                    children: [
+                                      TextFormField(
+                                        controller: _phoneController,
+                                        decoration: InputDecoration(
+                                          labelText: 'Phone',
+                                          prefixIcon: Icon(
+                                            FontAwesomeIcons.squarePhone,
+                                            color: colorScheme.primary,
+                                          ),
+                                          fillColor: colorScheme.inputFill,
+                                        ),
+                                        keyboardType: TextInputType.phone,
+                                        validator: (value) {
+                                          if (value == null || value.isEmpty) {
+                                            return 'Please enter your email or phone number';
+                                          }
+                                          return null;
+                                        },
+                                      ),
+                                      const SizedBox(height: 20),
+                                      TextFormField(
+                                        controller: _passwordController,
+                                        decoration: InputDecoration(
+                                          labelText: 'Password',
+                                          prefixIcon: Icon(
+                                            FontAwesomeIcons.fingerprint,
+                                            color: colorScheme.primary,
+                                          ),
+                                          suffixIcon: IconButton(
+                                            icon: Icon(
+                                              _obscurePassword
+                                                  ? FontAwesomeIcons.eyeSlash
+                                                  : FontAwesomeIcons.eye,
+                                              color: colorScheme.primary,
+                                            ),
+                                            onPressed: () {
+                                              setState(() {
+                                                _obscurePassword =
+                                                    !_obscurePassword;
+                                              });
+                                            },
+                                          ),
+                                          fillColor: colorScheme.inputFill,
+                                        ),
+                                        obscureText: _obscurePassword,
+                                        validator: (value) {
+                                          if (value == null || value.isEmpty) {
+                                            return 'Please enter your password';
+                                          }
+                                          return null;
+                                        },
+                                      ),
+                                      const SizedBox(height: 32),
+
+                                      // Sign In Button
+                                      SizedBox(
+                                        width: double.infinity,
+                                        child: ElevatedButton(
+                                          onPressed: () => _signIn(context),
+                                          style: ElevatedButton.styleFrom(
+                                            backgroundColor:
+                                                colorScheme.primary,
+                                            foregroundColor: Colors.white,
+                                          ),
+                                          child: const Text('Sign In'),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+
+                              const SizedBox(height: 32),
+
+                              // Divider
+                              Row(
+                                children: [
+                                  Expanded(
+                                    child: Divider(
+                                      color: isDarkMode
+                                          ? Colors.white.withOpacity(0.3)
+                                          : Colors.black.withOpacity(0.1),
+                                      thickness: 1,
+                                    ),
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 16),
+                                    child: Text(
+                                      'or',
+                                      style:
+                                          theme.textTheme.bodyMedium?.copyWith(
+                                        color: isDarkMode
+                                            ? Colors.white.withOpacity(0.8)
+                                            : Colors.black.withOpacity(0.6),
+                                      ),
+                                    ),
+                                  ),
+                                  Expanded(
+                                    child: Divider(
+                                      color: isDarkMode
+                                          ? Colors.white.withOpacity(0.3)
+                                          : Colors.black.withOpacity(0.1),
+                                      thickness: 1,
+                                    ),
+                                  ),
+                                ],
+                              ),
+
+                              const SizedBox(height: 32),
+
+                              // Social Login Buttons
+                              SocialButton(
+                                onPressed: () => _signInWithGoogle(context),
+                                icon: FontAwesomeIcons.google,
+                                label: 'Continue with Google',
+                                backgroundColor: colorScheme.socialButtonBg,
+                                isLoading: _isLoading,
+                              ),
+                              const SizedBox(height: 16),
+                              SocialButton(
+                                onPressed: () => _signInWithFacebook(context),
+                                icon: FontAwesomeIcons.facebook,
+                                label: 'Continue with Facebook',
+                                backgroundColor: colorScheme.socialButtonBg,
+                                isLoading: _isLoading,
+                              ),
+                            ],
                           ),
-                          const SizedBox(height: 8),
-                          Text(
-                            'Sign in to continue',
-                            style: theme.textTheme.bodyLarge?.copyWith(
+                        ),
+                      ),
+
+                      // Sign Up Link
+                      TextButton(
+                        onPressed: () {
+                          Navigator.pushNamed(context, '/signUp');
+                        },
+                        child: RichText(
+                          text: TextSpan(
+                            text: "Don't have an account? ",
+                            style: theme.textTheme.bodyMedium?.copyWith(
                               color: isDarkMode
                                   ? Colors.white.withOpacity(0.8)
                                   : Colors.black.withOpacity(0.6),
                             ),
-                            textAlign: TextAlign.center,
-                          ),
-                          const SizedBox(height: 48),
-
-                          // Form Card
-                          Container(
-                            padding: const EdgeInsets.all(24),
-                            decoration: BoxDecoration(
-                              color: colorScheme.cardBackground,
-                              borderRadius: BorderRadius.circular(24),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.black.withOpacity(0.05),
-                                  blurRadius: 20,
-                                  offset: const Offset(0, 10),
-                                ),
-                              ],
-                            ),
-                            child: Form(
-                              key: _formKey,
-                              child: Column(
-                                children: [
-                                  TextFormField(
-                                    controller: _phoneController,
-                                    decoration: InputDecoration(
-                                      labelText: 'Phone',
-                                      prefixIcon: Icon(
-                                        FontAwesomeIcons.squarePhone,
-                                        color: colorScheme.primary,
-                                      ),
-                                      fillColor: colorScheme.inputFill,
-                                    ),
-                                    keyboardType: TextInputType.phone,
-                                    validator: (value) {
-                                      if (value == null || value.isEmpty) {
-                                        return 'Please enter your email or phone number';
-                                      }
-                                      return null;
-                                    },
-                                  ),
-                                  const SizedBox(height: 20),
-                                  TextFormField(
-                                    controller: _passwordController,
-                                    decoration: InputDecoration(
-                                      labelText: 'Password',
-                                      prefixIcon: Icon(
-                                        FontAwesomeIcons.fingerprint,
-                                        color: colorScheme.primary,
-                                      ),
-                                      suffixIcon: IconButton(
-                                        icon: Icon(
-                                          _obscurePassword
-                                              ? FontAwesomeIcons.eyeSlash
-                                              : FontAwesomeIcons.eye,
-                                          color: colorScheme.primary,
-                                        ),
-                                        onPressed: () {
-                                          setState(() {
-                                            _obscurePassword =
-                                                !_obscurePassword;
-                                          });
-                                        },
-                                      ),
-                                      fillColor: colorScheme.inputFill,
-                                    ),
-                                    obscureText: _obscurePassword,
-                                    validator: (value) {
-                                      if (value == null || value.isEmpty) {
-                                        return 'Please enter your password';
-                                      }
-                                      return null;
-                                    },
-                                  ),
-                                  const SizedBox(height: 32),
-
-                                  // Sign In Button
-                                  SizedBox(
-                                    width: double.infinity,
-                                    child: _isLoading
-                                        ? Container(
-                                            height: 56,
-                                            decoration: BoxDecoration(
-                                              color: colorScheme.primary,
-                                              borderRadius:
-                                                  BorderRadius.circular(16),
-                                            ),
-                                            child: const Center(
-                                              child: SizedBox(
-                                                width: 24,
-                                                height: 24,
-                                                child:
-                                                    CircularProgressIndicator(
-                                                  strokeWidth: 2,
-                                                  valueColor:
-                                                      AlwaysStoppedAnimation<
-                                                          Color>(
-                                                    Colors.white,
-                                                  ),
-                                                ),
-                                              ),
-                                            ),
-                                          )
-                                        : ElevatedButton(
-                                            onPressed: () => _signIn(context),
-                                            style: ElevatedButton.styleFrom(
-                                              backgroundColor:
-                                                  colorScheme.primary,
-                                              foregroundColor: Colors.white,
-                                            ),
-                                            child: const Text('Sign In'),
-                                          ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-
-                          const SizedBox(height: 32),
-
-                          // Divider
-                          Row(
                             children: [
-                              Expanded(
-                                child: Divider(
-                                  color: isDarkMode
-                                      ? Colors.white.withOpacity(0.3)
-                                      : Colors.black.withOpacity(0.1),
-                                  thickness: 1,
-                                ),
-                              ),
-                              Padding(
-                                padding:
-                                    const EdgeInsets.symmetric(horizontal: 16),
-                                child: Text(
-                                  'or',
-                                  style: theme.textTheme.bodyMedium?.copyWith(
-                                    color: isDarkMode
-                                        ? Colors.white.withOpacity(0.8)
-                                        : Colors.black.withOpacity(0.6),
-                                  ),
-                                ),
-                              ),
-                              Expanded(
-                                child: Divider(
-                                  color: isDarkMode
-                                      ? Colors.white.withOpacity(0.3)
-                                      : Colors.black.withOpacity(0.1),
-                                  thickness: 1,
+                              TextSpan(
+                                text: 'Sign Up',
+                                style: TextStyle(
+                                  color:
+                                      isDarkMode ? Colors.white : Colors.black,
+                                  fontWeight: FontWeight.w600,
                                 ),
                               ),
                             ],
                           ),
-
-                          const SizedBox(height: 32),
-
-                          // Social Login Buttons
-                          SocialButton(
-                            onPressed: () => _signInWithGoogle(context),
-                            icon: FontAwesomeIcons.google,
-                            label: 'Continue with Google',
-                            backgroundColor: colorScheme.socialButtonBg,
-                            isLoading: _isLoading,
-                          ),
-                          const SizedBox(height: 16),
-                          SocialButton(
-                            onPressed: () => _signInWithFacebook(context),
-                            icon: FontAwesomeIcons.facebook,
-                            label: 'Continue with Facebook',
-                            backgroundColor: colorScheme.socialButtonBg,
-                            isLoading: _isLoading,
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-
-                  // Sign Up Link
-                  TextButton(
-                    onPressed: () {
-                      Navigator.pushNamed(context, '/signUp');
-                    },
-                    child: RichText(
-                      text: TextSpan(
-                        text: "Don't have an account? ",
-                        style: theme.textTheme.bodyMedium?.copyWith(
-                          color: isDarkMode
-                              ? Colors.white.withOpacity(0.8)
-                              : Colors.black.withOpacity(0.6),
                         ),
-                        children: [
-                          TextSpan(
-                            text: 'Sign Up',
-                            style: TextStyle(
-                              color: isDarkMode ? Colors.white : Colors.black,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                        ],
                       ),
-                    ),
+                    ],
                   ),
-                ],
-              ),
-            ),
           ),
         ),
       ),

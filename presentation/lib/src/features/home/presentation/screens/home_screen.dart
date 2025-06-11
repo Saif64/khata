@@ -2,14 +2,17 @@ import 'package:domain/domain.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:presentation/core/routes.dart';
+import 'package:presentation/core/utils/time_utils.dart';
+import 'package:presentation/core/widgets/loader.dart';
 import 'package:presentation/src/features/auth/provider/auth.dart';
 import 'package:presentation/src/features/home/presentation/bloc/home_bloc.dart';
 import 'package:presentation/src/features/home/presentation/bloc/home_state.dart';
-import 'package:presentation/src/features/home/presentation/widgets/sync_status_icon.dart';
+import 'package:presentation/src/features/home/presentation/widgets/transaction_list_widget.dart';
 
 import '../bloc/home_event.dart';
+import '../widgets/home_floating_action_buttons.dart';
 import '../widgets/summary_table.dart';
+import '../widgets/sync_status_icon.dart';
 import '../widgets/weekly_net_worth_chart.dart';
 import 'all_transactions_screen.dart';
 
@@ -115,7 +118,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
         child: BlocBuilder<HomeBloc, HomeState>(
           builder: (context, state) {
             if (state is HomeLoading || state is HomeInitial) {
-              return _buildLoadingState();
+              return Loader();
             }
             if (state is HomeLoaded) {
               return _buildLoadedState(state, theme, colorScheme);
@@ -127,21 +130,9 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
           },
         ),
       ),
-      floatingActionButton: _buildFloatingActionButtons(colorScheme),
+      floatingActionButton:
+          HomeFloatingActionButtons(context: context, colorScheme: colorScheme),
       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
-    );
-  }
-
-  Widget _buildLoadingState() {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          CircularProgressIndicator(),
-          const SizedBox(height: 16),
-          Text('Loading your data...'),
-        ],
-      ),
     );
   }
 
@@ -232,11 +223,15 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
             ),
           ),
           SliverToBoxAdapter(
-            child:
-                _buildTransactionsList(state.transactions, theme, colorScheme),
+            child: TransactionListWidget(
+              transactions: state.transactions,
+              theme: theme,
+              colorScheme: colorScheme,
+              selectedFilter: _selectedFilter,
+            ),
           ),
           const SliverToBoxAdapter(
-            child: SizedBox(height: 100), // Space for FAB
+            child: SizedBox(height: 100),
           ),
         ],
       ),
@@ -280,24 +275,26 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     final yesterday = today.subtract(const Duration(days: 1));
 
     final todaysSales = transactions
-        .where((t) => t.type == TransactionType.sale && _isToday(t.date, today))
+        .where((t) =>
+            t.type == TransactionType.sale && TimeUtils.isToday(t.date, today))
         .fold(0.0, (sum, t) => sum + t.amount);
 
     final todaysExpenses = transactions
-        .where(
-            (t) => t.type == TransactionType.expense && _isToday(t.date, today))
+        .where((t) =>
+            t.type == TransactionType.expense &&
+            TimeUtils.isToday(t.date, today))
         .fold(0.0, (sum, t) => sum + t.amount);
 
     final yesterdaysSales = transactions
         .where((t) =>
             t.type == TransactionType.sale &&
-            _isYesterday(t.date, yesterday, today))
+            TimeUtils.isYesterday(t.date, yesterday, today))
         .fold(0.0, (sum, t) => sum + t.amount);
 
     final yesterdaysExpenses = transactions
         .where((t) =>
             t.type == TransactionType.expense &&
-            _isYesterday(t.date, yesterday, today))
+            TimeUtils.isYesterday(t.date, yesterday, today))
         .fold(0.0, (sum, t) => sum + t.amount);
 
     return SummaryWidget(
@@ -369,252 +366,5 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
         );
       }).toList(),
     );
-  }
-
-  Widget _buildTransactionsList(List<TransactionEntity> transactions,
-      ThemeData theme, ColorScheme colorScheme) {
-    if (transactions.isEmpty) {
-      return _buildEmptyState(theme, colorScheme);
-    }
-
-    // Filter transactions based on selected filter
-    List<TransactionEntity> filteredTransactions = transactions;
-    if (_selectedFilter == 'Sales') {
-      filteredTransactions =
-          transactions.where((t) => t.type == TransactionType.sale).toList();
-    } else if (_selectedFilter == 'Expenses') {
-      filteredTransactions =
-          transactions.where((t) => t.type == TransactionType.expense).toList();
-    }
-
-    // Sort by date, most recent first
-    filteredTransactions.sort((a, b) => b.date.compareTo(a.date));
-
-    // Take only recent transactions for display
-    final recentTransactions = filteredTransactions.take(10).toList();
-
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20),
-      child: Column(
-        children: recentTransactions.asMap().entries.map((entry) {
-          final index = entry.key;
-          final transaction = entry.value;
-          return AnimatedContainer(
-            duration: Duration(milliseconds: 200 + (index * 50)),
-            child: Padding(
-              padding: const EdgeInsets.only(bottom: 12),
-              child: _buildTransactionItem(transaction, theme, colorScheme),
-            ),
-          );
-        }).toList(),
-      ),
-    );
-  }
-
-  Widget _buildTransactionItem(
-      TransactionEntity transaction, ThemeData theme, ColorScheme colorScheme) {
-    final isSale = transaction.type == TransactionType.sale;
-    final color = isSale ? colorScheme.primary : colorScheme.error;
-    final icon = isSale
-        ? FontAwesomeIcons.arrowTrendUp
-        : FontAwesomeIcons.arrowTrendDown;
-
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: theme.colorScheme.surface,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: theme.colorScheme.outline.withOpacity(0.1)),
-        boxShadow: [
-          BoxShadow(
-            color: theme.colorScheme.shadow.withOpacity(0.05),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Row(
-        children: [
-          Container(
-            padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              color: color.withOpacity(0.1),
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: FaIcon(icon, color: color, size: 20),
-          ),
-          const SizedBox(width: 16),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  transaction.description,
-                  style: theme.textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  _formatDate(transaction.date),
-                  style: theme.textTheme.bodySmall?.copyWith(
-                    color: theme.colorScheme.onSurface.withOpacity(0.6),
-                  ),
-                ),
-              ],
-            ),
-          ),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: [
-              Text(
-                '${isSale ? '+' : '-'}\$${transaction.amount.toStringAsFixed(2)}',
-                style: theme.textTheme.titleMedium?.copyWith(
-                  color: color,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              const SizedBox(height: 4),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                decoration: BoxDecoration(
-                  color: color.withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Text(
-                  isSale ? 'Sale' : 'Expense',
-                  style: theme.textTheme.bodySmall?.copyWith(
-                    color: color,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildEmptyState(ThemeData theme, ColorScheme colorScheme) {
-    return Container(
-      margin: const EdgeInsets.all(20),
-      padding: const EdgeInsets.all(32),
-      decoration: BoxDecoration(
-        color: theme.colorScheme.surface,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: theme.colorScheme.outline.withOpacity(0.1)),
-      ),
-      child: Column(
-        children: [
-          Container(
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: colorScheme.primary.withOpacity(0.1),
-              borderRadius: BorderRadius.circular(16),
-            ),
-            child: Icon(
-              FontAwesomeIcons.receipt,
-              size: 48,
-              color: colorScheme.primary,
-            ),
-          ),
-          const SizedBox(height: 16),
-          Text(
-            'No transactions yet',
-            style: theme.textTheme.titleLarge?.copyWith(
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            'Start by adding your first sale or expense using the buttons below',
-            style: theme.textTheme.bodyMedium?.copyWith(
-              color: theme.colorScheme.onSurface.withOpacity(0.6),
-            ),
-            textAlign: TextAlign.center,
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildFloatingActionButtons(ColorScheme colorScheme) {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.end,
-      children: [
-        FloatingActionButton.extended(
-          heroTag: 'add_sale',
-          onPressed: () {
-            Navigator.pushNamed(
-              context,
-              Routes.ADD_TRANSACTION,
-              arguments: TransactionType.sale,
-            );
-          },
-          label: const Text('Add Sale'),
-          icon: const FaIcon(FontAwesomeIcons.plus, size: 16),
-          backgroundColor: colorScheme.primary,
-          foregroundColor: Colors.white,
-          elevation: 8,
-        ),
-        const SizedBox(height: 12),
-        FloatingActionButton.extended(
-          heroTag: 'add_expense',
-          onPressed: () {
-            Navigator.pushNamed(
-              context,
-              Routes.ADD_TRANSACTION,
-              arguments: TransactionType.expense,
-            );
-          },
-          label: const Text('Add Expense'),
-          icon: const FaIcon(FontAwesomeIcons.minus, size: 16),
-          backgroundColor: colorScheme.error,
-          foregroundColor: Colors.white,
-          elevation: 8,
-        ),
-      ],
-    );
-  }
-
-  bool _isToday(DateTime date, DateTime today) {
-    return date.year == today.year &&
-        date.month == today.month &&
-        date.day == today.day;
-  }
-
-  bool _isYesterday(DateTime date, DateTime yesterday, DateTime today) {
-    final dateOnly = DateTime(date.year, date.month, date.day);
-    return dateOnly == yesterday;
-  }
-
-  String _formatDate(DateTime date) {
-    final now = DateTime.now();
-    final today = DateTime(now.year, now.month, now.day);
-    final yesterday = today.subtract(const Duration(days: 1));
-    final dateOnly = DateTime(date.year, date.month, date.day);
-
-    if (dateOnly == today) {
-      return 'Today';
-    } else if (dateOnly == yesterday) {
-      return 'Yesterday';
-    } else {
-      final months = [
-        'Jan',
-        'Feb',
-        'Mar',
-        'Apr',
-        'May',
-        'Jun',
-        'Jul',
-        'Aug',
-        'Sep',
-        'Oct',
-        'Nov',
-        'Dec'
-      ];
-      return '${date.day} ${months[date.month - 1]}';
-    }
   }
 }
