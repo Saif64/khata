@@ -12,18 +12,19 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # Step 1: Check out the code from the repository
+      # Step 1: Check out the code
       - name: Checkout code
         uses: actions/checkout@v3
 
-      # Step 2: Set up the Flutter environment
+      # Step 2: Set up Flutter
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.32.0' # You can specify your desired Flutter version
+          # Make sure this version matches your project's Flutter version
+          flutter-version: '3.19.6' # Or your specific version
           channel: 'stable'
 
-      # Step 3: Get the app version from the presentation's pubspec.yaml
+      # Step 3: Get the app version
       - name: Get pubspec version
         id: pubspec
         uses: CumulusDS/get-yaml-paths-action@v1
@@ -31,23 +32,23 @@ jobs:
           file: presentation/pubspec.yaml
           version: version
 
-      # Step 4: Install dependencies and build the release APK
+      # Step 4: Create the .env file from the GitHub secret
+      - name: Create .env file
+        # This creates the .env file in the correct directory
+        run: echo "${{ secrets.ENV_FILE }}" > presentation/.env
+
+      # Step 5: Install dependencies and build the APK
       - name: Install Dependencies and Build APK
-        # This is the key change: set the working directory for the following commands
         working-directory: ./presentation
         run: |
-          # This command will now run inside the 'presentation' directory
           flutter pub get
-          
-          # This build command will also run inside the 'presentation' directory
           flutter build apk --release --obfuscate --split-debug-info=./debug_info
 
-      # Step 5: Create a GitHub Release and attach the APK
+      # Step 6: Create a GitHub Release
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v1
         with:
           tag_name: v${{ steps.pubspec.outputs.version }}
           name: Release v${{ steps.pubspec.outputs.version }}
           generate_release_notes: true
-          # The path to the APK is relative to the repository root
           files: presentation/build/app/outputs/flutter-apk/app-release.apk
