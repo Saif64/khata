@@ -26,7 +26,7 @@ class HomeRemoteDataSourceImpl implements HomeRemoteDataSource {
               id: item['id'],
               amount: (item['amount'] as num).toDouble(),
               description: item['description'],
-              type: (item['type'] as String) == 'TransactionType.sale'
+              type: (item['type'] as String) == 'sale'
                   ? TransactionType.sale
                   : TransactionType.expense,
               date: DateTime.parse(item['date']),
@@ -45,7 +45,7 @@ class HomeRemoteDataSourceImpl implements HomeRemoteDataSource {
     await supabaseClient.from('transactions').update({
       'amount': transaction.amount,
       'description': transaction.description,
-      'type': transaction.type.toString(),
+      'type': transaction.type.name,
       'date': transaction.date.toIso8601String(),
     }).eq('id', transaction.id);
   }
@@ -57,7 +57,7 @@ class HomeRemoteDataSourceImpl implements HomeRemoteDataSource {
               'id': t.id,
               'amount': t.amount,
               'description': t.description,
-              'type': t.type.toString(),
+              'type': t.type.name,
               'date': t.date.toIso8601String(),
               'user_id': supabaseClient.auth.currentUser!.id,
             })
