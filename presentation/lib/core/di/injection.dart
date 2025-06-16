@@ -11,7 +11,8 @@ final di = GetIt.instance;
 
 void setupLocator() {
   di.registerLazySingleton<SupabaseClient>(() => Supabase.instance.client);
-  di.registerLazySingleton<Box<String>>(() => Hive.box<String>('userBox'));
+  di.registerLazySingleton<Box<UserEntity>>(
+      () => Hive.box<UserEntity>('userBox'));
 
   di.registerLazySingleton<Box<TransactionEntity>>(
       () => Hive.box<TransactionEntity>('transactionBox'));
@@ -19,9 +20,11 @@ void setupLocator() {
   di.registerLazySingleton<AuthRemoteDataSource>(
     () => AuthRemoteDataSourceImpl(di<SupabaseClient>()),
   );
+
   di.registerLazySingleton<AuthLocalDataSource>(
-    () => AuthLocalDataSourceImpl(di<Box<String>>()),
+    () => AuthLocalDataSourceImpl(di<Box<UserEntity>>()),
   );
+
   di.registerLazySingleton<AuthRepository>(
     () => AuthRepositoryImpl(
         di<AuthRemoteDataSource>(), di<AuthLocalDataSource>()),

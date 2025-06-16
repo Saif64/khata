@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:presentation/core/theme/app_theme.dart';
+import 'package:presentation/src/features/auth/adapter/user_entity_adapter.dart';
 import 'package:presentation/src/features/auth/provider/auth.dart';
 import 'package:presentation/src/features/home/adapters/transaction_adapter.dart';
 import 'package:presentation/src/features/home/presentation/bloc/home_bloc.dart';
@@ -32,7 +33,8 @@ Future<void> main() async {
   await Hive.initFlutter();
   Hive.registerAdapter(TransactionEntityAdapter());
   Hive.registerAdapter(TransactionTypeAdapter());
-  await Hive.openBox<String>('userBox');
+  Hive.registerAdapter(UserEntityAdapter()); // Register the adapter
+  await Hive.openBox<UserEntity>('userBox');
   await Hive.openBox<TransactionEntity>('transactionBox');
 
   setupLocator();

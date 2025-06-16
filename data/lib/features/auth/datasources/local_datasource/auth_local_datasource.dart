@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 import 'package:domain/domain.dart';
 import 'package:hive/hive.dart';
 
@@ -13,22 +11,18 @@ const String _userBoxKey = 'userBox';
 const String _userKey = 'user';
 
 class AuthLocalDataSourceImpl implements AuthLocalDataSource {
-  final Box<String> userBox;
+  final Box<UserEntity> userBox;
 
   AuthLocalDataSourceImpl(this.userBox);
 
   @override
   Future<void> cacheUser(UserEntity user) async {
-    await userBox.put(_userKey, json.encode(user.toJson()));
+    await userBox.put(_userKey, user);
   }
 
   @override
   Future<UserEntity?> getCachedUser() async {
-    final userJson = userBox.get(_userKey);
-    if (userJson != null) {
-      return UserEntity.fromJson(json.decode(userJson));
-    }
-    return null;
+    return userBox.get(_userKey);
   }
 
   @override
