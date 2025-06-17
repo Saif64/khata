@@ -36,9 +36,6 @@ jobs:
           file: presentation/pubspec.yaml
           version: version
 
-      # Step 4: Create the .env file from the GitHub secret
-      - name: Create .env file
-        run: echo "${{ secrets.ENV_FILE }}" > presentation/.env
 
       # Step 5: Install dependencies and build the APK
       - name: Install Dependencies and Build APK

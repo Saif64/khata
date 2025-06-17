@@ -1,7 +1,6 @@
 import 'package:domain/domain.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:presentation/core/theme/app_theme.dart';
 import 'package:presentation/src/features/auth/provider/auth.dart';
@@ -20,13 +19,16 @@ import 'src/auth_wrapper.dart';
 import 'src/features/auth/presentation/screens/sign_in_screen.dart';
 import 'src/features/auth/presentation/screens/sign_up_screen.dart';
 
+const String _SUPABASE_URL = "https://xwtnezojyyyephwwctuy.supabase.co";
+const String _SUPABASE_ANON_KEY =
+    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inh3dG5lem9qeXl5ZXBod3djdHV5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDk0MTEyMzMsImV4cCI6MjA2NDk4NzIzM30.TmJ9SYwC9fq3EO_tVwK-O3LKg2zb82p0As2q4688JOk";
+
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await dotenv.load(fileName: ".env");
 
   await Supabase.initialize(
-    url: dotenv.env['SUPABASE_URL']!,
-    anonKey: dotenv.env['SUPABASE_ANON_KEY']!,
+    url: _SUPABASE_URL,
+    anonKey: _SUPABASE_ANON_KEY,
   );
 
   await Hive.initFlutter();
